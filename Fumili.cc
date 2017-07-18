@@ -125,7 +125,6 @@ void Calculate_Full_Matrix_For_Substituted_Parameters(int nf,int nc,
 		     VL[ind(k,l)] += SM[k-nf][i]*VL[ind(i,l)];
 		  }
 	    }
-	 //	 cout << " Here,k " << k << endl;
 	 for(int l = nf; l <= k; l++)// index of column
 	    {
 	       VL[ind(k,l)] = .0;
@@ -136,13 +135,6 @@ void Calculate_Full_Matrix_For_Substituted_Parameters(int nf,int nc,
 			   VL[ind(k,l)] += SM[k-nf][i]*VL[ind(i,j)]*SM[l-nf][j];
 			}
 		  }
-	       /*
-	       if(l == k)
-		  {
-		     SIGMA[k] = sqrt(VL[ind(k,k)]);
-		     R[k] = VL[ind(k,k)]*ZV[k - nf];
-		  }
-	       */
 	    }
 
       }
@@ -171,11 +163,8 @@ void Calculate_constraint_info(int nf,int nc, double A[],double *psis,
 		  }
 	       Check[i] +=  (dpsis[i][j]*dpsis[i][j])*VL[ind(j,j)];
 	    }
-	 //	 psis_error[i] = sqrt(psis_error[i]);
 	 if(idebug)cout << i << "  " << nf+i << "          " << A[nf + i] <<  "         "
 	      << psis[i]<<  "   "  << psis_error[i]  <<  "   "  << Check[i]  << endl;
-	 //	      << psis[i]<<  "   "  << psis_error[i]<< "     "
-	 //   << psis[i]/psis_error[i] << endl;
 	 /*
 	 */
 	 //	 Ratio_Of_Two_Lasts[i] = psis[i]/psis_error[i];
@@ -463,7 +452,6 @@ void   Get_New_Quadratic_Form(int nf,int nc,
 		   Z_New[ind(i,j)] +=   Z[ind(i,nf + k)]*SM[k][j] +Z[ind(nf + k,j)]*SM[k][i] ;
 		   for(int l = 0;l < nc;l++)
 		      {
-			 //			 Z_New[ind(i,j)] +=   Z[ind(nf + l,nf + k)]*SM[k][i]*SM[l][j];
 			 Z_New[ind(i,j)] += Z[ind(nf + l,nf + k)]*SM[l][j]*SM[k][i];
 		      }
 		}
