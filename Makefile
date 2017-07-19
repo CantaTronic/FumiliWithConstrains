@@ -15,7 +15,7 @@ OBJS := Fumili mconvd
 run: $(TARG)
 	@./$<
 
-test_inv: $(addsuffix .o,test_inv mtrx_inv_$(LALIB))
+test_inv: $(addsuffix .o,test_inv mtrx_inv_$(LALIB) test_mat)
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -l$(LALIB) -o $@
 	@./$@

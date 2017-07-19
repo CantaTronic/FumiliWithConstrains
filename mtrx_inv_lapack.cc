@@ -1,6 +1,6 @@
 
-#include <stdio.h>
-// #include <stddef.h>
+#include <cstdio>
+#include <cstring>
 #include "mtrx_inv_lapack.h"
 
 extern "C" {
@@ -24,6 +24,28 @@ int mtrx_inv(const int N, double * const M) {
   delete [] pivotArray;
   delete [] lapackWorkspace;
   return errorHandler;
+}
+
+double mtrx_det(const int N, const double * const M) {
+  int errorHandler;
+  int * pivotArray = new int[N];
+  double * T = new double[N*N];
+  memcpy(T, M, N*N*sizeof(double));
+  dgetrf_(&N, &N, T, &N, pivotArray, &errorHandler);
+  if(errorHandler != 0) {
+    delete [] pivotArray;
+    delete [] T;
+    return 0.;
+  }
+  double det = 1.;
+  for(int i = 0; i < N; i++)
+    if(pivotArray[i]-1 != i) // note: fortran indexing starts from 1!
+      det *= -1;
+  for(int i = 0; i < N; i++)
+    det *= T[i*N+i]; // diagonal element
+  delete [] pivotArray;
+  delete [] T;
+  return det;
 }
 
 void mtrx_print(const unsigned N, const double * const M) {

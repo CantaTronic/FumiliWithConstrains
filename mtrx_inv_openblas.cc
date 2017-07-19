@@ -1,5 +1,5 @@
 
-#include <stdio.h>
+#include <cstdio>
 #include <openblas/lapacke.h>
 #include "mtrx_inv_openblas.h"
 
