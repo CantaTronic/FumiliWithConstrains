@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <TMatrixD.h>
+#include "ind.h"
 #include "mconvd.h"
 #include "Fumili.h"
 #define PARAMETER_SIZE 10
