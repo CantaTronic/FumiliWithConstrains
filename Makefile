@@ -1,5 +1,7 @@
 
 FDDIR := $(FDMODULE)
+LALIB := lapack
+# LALIB := openblas
 
 CXXFLAGS := -O2 -g -Wall -fPIC -Wno-maybe-uninitialized
 CXXFLAGS += $(shell root-config --cflags)
@@ -12,6 +14,11 @@ OBJS := Fumili mconvd
 
 run: $(TARG)
 	@./$<
+
+test_inv: $(addsuffix .o,test_inv mtrx_inv_$(LALIB))
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -l$(LALIB) -o $@
+	@./$@
 
 %: %.cc
 %: %.o
@@ -30,8 +37,7 @@ run: $(TARG)
 
 clean:
 	@echo 'Cleaning'
-	@$(RM) $(TARG) $(addsuffix .o,$(TARG)) $(addsuffix .d,$(TARG)) \
-	$(addsuffix .o,$(OBJS)) $(addsuffix .d,$(OBJS))
+	@$(RM) $(TARG) test_inv *.o *.d
 
 .PRECIOUS: %.d %.o
 
