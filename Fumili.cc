@@ -2,10 +2,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include "mtrx_inv_lapack.h"
-typedef FSqMtrx FumiliMatrix;
-// #include <TMatrixD.h>
-// typedef TMatrixD FumiliMatrix;
+#include "mtrx_inv.h"
 #include "ind.h"
 #include "mconvd.h"
 #include "Fumili.h"
@@ -308,7 +305,7 @@ bool Get_RV_SM( int nf, int nc,
                 double * psis, double ** dpsis,
                 double * RV, double ** SM ) {
   double tolerance = 2.2204e-16;
-  FumiliMatrix m(nc,nc);
+  FSqMtrx m(nc,nc);
   if(idebug)
     cout << " Get_RV_SM, nf,nc " << nf << "  " << nc << endl;
   /* Getting QM - last nc terms in each constraint */
@@ -320,7 +317,7 @@ bool Get_RV_SM( int nf, int nc,
         return 0;
     }
   }
-  FumiliMatrix mp(m);
+  FSqMtrx mp(m);
 
   if(idebug) {
     cout << " Get_RV_SM : bef " << endl;
@@ -919,7 +916,7 @@ int Get_Qty_Of_Different_Non_Zero_Derivatives(int nc,int *Qty_nc,int **Numbers,
 }
 void GetDeterminant(double ** dpsis_User, int nc,
                     int * SelectedIndices, double & DeterminantValue) {
-  FumiliMatrix m(nc, nc);
+  FSqMtrx m(nc, nc);
   for(int i = 0; i < nc; i++)
     for(int j = 0; j < nc; j++)
       m[i][j] = dpsis_User[i][SelectedIndices[j]];
@@ -1659,7 +1656,7 @@ L4:
     //cout << " psis " << psis[0] << endl;
     if(idebug) {
       // Errors - error  for fixed parameters are zeroes, for others - from matrix
-      FumiliMatrix Z0_Temp(nf+nc, nf+nc);
+      FSqMtrx Z0_Temp(nf+nc, nf+nc);
       double Errors[M_User];
       cout << "Z0_Temp : " << endl;
       for(int i = 0; i < nf+nc; i++) {

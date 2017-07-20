@@ -1,6 +1,8 @@
 
 #pragma once
 
+#ifndef MTRX_LIB_ROOT
+
 /** TODO const */
 class FSqMtrx {
 private:
@@ -14,13 +16,13 @@ public:
   FSqMtrx & operator= (FSqMtrx & rhs);
   ~FSqMtrx() { delete [] M; }
   double * operator[] (int i) { return &M[i*N]; }
-/**
-  inplace inverse n x n matrix A.
-  returns:
-    ret = 0 on success
-    ret < 0 illegal argument value
-    ret > 0 singular matrix
-*/
+  /**
+    inplace inverse n x n matrix A.
+    returns:
+      ret = 0 on success
+      ret < 0 illegal argument value
+      ret > 0 singular matrix
+  */
   static int Invert(const int N, double * const M);
   static double Determinant(const int N, const double * const M);
   static void Print(const int N, const double * const M);
@@ -28,3 +30,10 @@ public:
   double Determinant() { return Determinant(N, M); }
   void Print() { Print(N, M); }
 };
+
+#else
+
+#include <TMatrixD.h>
+typedef TMatrixD FSqMtrx;
+
+#endif

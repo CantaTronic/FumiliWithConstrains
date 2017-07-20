@@ -1,14 +1,21 @@
 
+#include "mtrx_inv.h"
+
+#ifndef MTRX_LIB_ROOT
+
 #include <cstdio>
 #include <cstring>
-#include "mtrx_inv_lapack.h"
 
-extern "C" {
-  // LU decomoposition of a general matrix
-  void dgetrf_(const int *, const int *, double *, const int *, int *, int *);
-  // generate inverse of a matrix given its LU decomposition
-  void dgetri_(const int *, double *, const int *, int *, double *, const int *, int *);
-}
+#ifdef MTRX_LIB_LAPACK
+  extern "C" {
+    // LU decomoposition of a general matrix
+    void dgetrf_(const int *, const int *, double *, const int *, int *, int *);
+    // generate inverse of a matrix given its LU decomposition
+    void dgetri_(const int *, double *, const int *, int *, double *, const int *, int *);
+  }
+#else
+  #include <openblas/lapacke.h>
+#endif
 
 FSqMtrx::FSqMtrx(int n1, int n2): N(n1), M(new double[N*N]) {
   if(n1 != n2) {
@@ -34,6 +41,8 @@ FSqMtrx & FSqMtrx::operator= (FSqMtrx & rhs) {
   memcpy(M, rhs.M, N*N*sizeof(double));
   return *this;
 }
+
+#ifdef MTRX_LIB_LAPACK
 
 int FSqMtrx::Invert(const int N, double * const M) {
   int errorHandler;
@@ -73,6 +82,42 @@ double FSqMtrx::Determinant(const int N, const double * const M) {
   return det;
 }
 
+#else
+
+int FSqMtrx::Invert(const int n, double * const A) {
+  int ipiv[n+1];
+  int ret;
+  ret = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, A, n, ipiv);
+  if (ret !=0)
+    return ret;
+  ret = LAPACKE_dgetri(LAPACK_ROW_MAJOR, n, A, n, ipiv);
+  return ret;
+}
+
+double FSqMtrx::Determinant(const int n, const double * const M) {
+  int ret;
+  int ipiv[n+1];
+  double * T = new double[n*n];
+  memcpy(T, M, n*n*sizeof(double));
+  ret = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, T, n, ipiv);
+  if(ret != 0) {
+    delete [] T;
+    return 0.;
+  }
+  double det = 1.;
+  // sign
+  for(int i = 0; i < n; i++)
+    if(ipiv[i]-1 != i) // note: fortran indexing starts from 1!
+      det *= -1;
+  // value
+  for(int i = 0; i < n; i++)
+    det *= T[i*n+i]; // diagonal element
+  delete [] T;
+  return det;
+}
+
+#endif
+
 void FSqMtrx::Print(const int N, const double * const M) {
   for (int i = 0; i < N*N; i++) {
     if ((i%N) == 0) putchar('\n');
@@ -81,3 +126,6 @@ void FSqMtrx::Print(const int N, const double * const M) {
   putchar('\n');
   fflush(stdout);
 }
+
+#endif
+

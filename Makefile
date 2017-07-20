@@ -1,39 +1,53 @@
 
-FDDIR := $(FDMODULE)
-LALIB := lapack
-# LALIB := openblas
+LALIB := LAPACK
+# LALIB := OPENBLAS
+# LALIB := ROOT
 
 CXXFLAGS := -O2 -g -Wall -fPIC -Wno-maybe-uninitialized
-CXXFLAGS += $(shell root-config --cflags)
+ifeq ($(LALIB),ROOT)
+  CXXFLAGS += $(shell root-config --cflags)
+endif
 
 LDFLAGS := -O2 -g
-LDFLAGS += $(shell root-config --libs) -lMinuit -lGeom
+ifeq ($(LALIB),LAPACK)
+  LDFLAGS += -llapack
+endif
+ifeq ($(LALIB),OPENBLAS)
+  LDFLAGS += -lopenblas
+endif
+ifeq ($(LALIB),ROOT)
+  LDFLAGS += $(shell root-config --libs)
+endif
 
 TARG := test
-OBJS := Fumili mconvd mtrx_inv_$(LALIB)
+OBJS := Fumili mconvd mtrx_inv
 
 run: $(TARG)
 	@./$<
 
-test_inv: $(addsuffix .o,test_inv mtrx_inv_$(LALIB) test_mat)
+test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
 	@echo 'Linking executable $@'
-	@$(CXX) $^ $(LDFLAGS) -l$(LALIB) -o $@
+	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
 
 %: %.cc
 %: %.o
 %: %.o $(addsuffix .o,$(OBJS))
 	@echo 'Linking executable $@'
-	@$(CXX) $^ $(LDFLAGS) -l$(LALIB) -o $@
+	@$(CXX) $^ $(LDFLAGS) -o $@
 
 %.o: %.cc
 %.o: %.cc %.d
 	@echo 'Compiling $@'
-	@$(CXX) $< -c $(CXXFLAGS) $(CPPFLAGS) -o $@
+	@$(CXX) $< -c $(CXXFLAGS) -DMTRX_LIB_$(LALIB) -o $@
+
+test_mat.o: test_mat.cc test_mat.d
+	@echo 'Compiling $@'
+	@$(CXX) $< -c $(CXXFLAGS) -Wno-unused -DMTRX_LIB_$(LALIB) -o $@
 
 %.d: %.cc
 	@echo Making dependency for file $< ...
-	@$(CXX) $< -MT $(subst .d,.o,$@) -MM $(CXXFLAGS) -MF $@
+	@$(CXX) $< -MT $(subst .d,.o,$@) -MM $(CXXFLAGS) -DMTRX_LIB_$(LALIB) -MF $@
 
 clean:
 	@echo 'Cleaning'
