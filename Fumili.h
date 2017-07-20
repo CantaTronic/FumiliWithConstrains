@@ -3,8 +3,6 @@
 
 #include <cstdlib>
 
-extern int Fig_Out[20][4], Fig_Count[20], Qty_Out,ndf;
-extern double * psis_Out; // Constraint values
 extern int idebug;
 
 int fumiliSK( int M_User, double & S_User, int N1, int N2, int N3, double EPS,

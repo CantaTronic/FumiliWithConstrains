@@ -15,7 +15,6 @@ void constraints(int M, double A[], double * psis, double ** dpsis);
 
 int main(int arc, char ** argv) {
   idebug = 0;
-  psis_Out = new double[1];
 
   ifstream ifs("unif.dat");
   for(int i = 0; i < 100000; i++)
