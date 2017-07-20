@@ -10,7 +10,30 @@ extern "C" {
   void dgetri_(const int *, double *, const int *, int *, double *, const int *, int *);
 }
 
-int mtrx_inv(const int N, double * const M) {
+FSqMtrx::FSqMtrx(int n1, int n2): N(n1), M(new double[N*N]) {
+  fprintf(stderr, "Warning:\n");
+  fprintf(stderr, "  trying to make square matrix of size %i*%i\n", n1, n2);
+  fprintf(stderr, "  creating matrix %i*%i instead\n", n1, n1);
+  fflush(stderr);
+}
+
+FSqMtrx::FSqMtrx(int n, double * m): N(n), M(new double[N*N]) {
+  memcpy(M, m, N*N*sizeof(double));
+}
+
+FSqMtrx::FSqMtrx(FSqMtrx & other): N(other.N), M(new double[N*N]) {
+  memcpy(M, other.M, N*N*sizeof(double));
+}
+
+FSqMtrx & FSqMtrx::operator= (FSqMtrx & rhs) {
+  delete [] M;
+  N = rhs.N;
+  M = new double[N*N];
+  memcpy(M, rhs.M, N*N*sizeof(double));
+  return *this;
+}
+
+int FSqMtrx::Invert(const int N, double * const M) {
   int errorHandler;
   int * pivotArray = new int[N];
   dgetrf_(&N, &N, M, &N, pivotArray, &errorHandler);
@@ -26,7 +49,7 @@ int mtrx_inv(const int N, double * const M) {
   return errorHandler;
 }
 
-double mtrx_det(const int N, const double * const M) {
+double FSqMtrx::Determinant(const int N, const double * const M) {
   int errorHandler;
   int * pivotArray = new int[N];
   double * T = new double[N*N];
@@ -48,10 +71,11 @@ double mtrx_det(const int N, const double * const M) {
   return det;
 }
 
-void mtrx_print(const unsigned N, const double * const M) {
-  for (unsigned i = 0; i < N*N; i++) {
+void FSqMtrx::Print(const int N, const double * const M) {
+  for (int i = 0; i < N*N; i++) {
     if ((i%N) == 0) putchar('\n');
     printf("%+12.8f ", M[i]);
   }
   putchar('\n');
+  fflush(stdout);
 }

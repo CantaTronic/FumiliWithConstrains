@@ -23,18 +23,19 @@ int main() {
 
   printf(" ==== TMatrixD ====\n");
   TMatrixD M(N, N, A);
-  mtrx_print(N, M.GetMatrixArray());
+  FSqMtrx::Print(N, M.GetMatrixArray());
   printf("\n%+12.8f\n", M.Determinant());
   M.Invert();
-  mtrx_print(N, M.GetMatrixArray());
+  FSqMtrx::Print(N, M.GetMatrixArray());
   printf("\n%+12.8f\n", M.Determinant());
   printf(" ==================\n");
 
+  FSqMtrx m(N, A);
   printf(" ==== mtrx_inv ====\n");
-  mtrx_print(N, A);
-  printf("\n%+12.8f\n", mtrx_det(N, A));
-  mtrx_inv(N, A);
-  mtrx_print(N, A);
-  printf("\n%+12.8f\n", mtrx_det(N, A));
+  m.Print();
+  printf("\n%+12.8f\n", m.Determinant());
+  m.Invert();
+  m.Print();
+  printf("\n%+12.8f\n", m.Determinant());
   printf(" ==================\n");
 }
