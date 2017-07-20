@@ -10,4 +10,6 @@
 */
 int mtrx_inv(const unsigned n, double * const A);
 
+double mtrx_det(const int n, const double * const M);
+
 void mtrx_print(const unsigned n, const double * const A);
