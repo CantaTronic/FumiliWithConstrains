@@ -122,121 +122,73 @@ void Calculate_Full_Matrix_For_Substituted_Parameters(int nf,int nc,
 }
 
 void print_iteration( int M, double PL0[],
-		      double PL[], int NN3, double S,
-		      double GT, double AKAPPA, double ALAMBD,
-		      double A[],double SIGMA[], double R[], double Z[])
-{
-   if(idebug)cout << " Here " << endl;
-   if(idebug)std::cout << " ITER.NO." << setw(3) << NN3
-      << ", S=" << setiosflags(ios::scientific) << setw(12) << setprecision(5) << S
-      << ", EC =" << setiosflags(ios::scientific) << setw(12) << setprecision(5) << GT
-      << ", KAPPA=" << setiosflags(ios::scientific) << setw(9) << setprecision(4) << AKAPPA
-      << ", LAMBDA=" << setiosflags(ios::scientific) << setw(9) << setprecision(4) << ALAMBD
-      << endl;
- if(idebug)cout << "      PARAMETER      PARAMETER         STANDARD        CORRELATION "
-      << endl;
- if(idebug)cout << "        NUMBER        VALUE           DEVIATION          FACTOR "
-      << endl;
- int I;
- for( I = 0; I < M; I++)
-  {
-   if(PL0[I] > .0)
-    {
-     if(PL[I] > .0)
-      {
-       if(idebug)cout << "        " << setw(3) << I << "    "
-	    << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
-	    << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << SIGMA[I]
-	    << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << R[I] << endl;
-      }
-     else
-      {
-       if(PL[I] == .0)
-	{
-	   if(idebug)cout << "        " << setw(3) << I << "    "
-		<< "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
-		<< "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << SIGMA[I]
-		<< "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << R[I]
-		<< "  ON BOUNDARY " <<  endl;
-	}
-       else
-	  {
-	     if(PL[I] >= -1.)
-		{
-	
-		   if(idebug)cout << "        " << setw(3) << I << "    "
-			<< "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
-			<< "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << SIGMA[I]
-			<< "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << R[I]
-			<< "  ON BOUNDARY " <<  endl;
-		}
-	     else
-		{
-		   if(idebug)cout << "         " << setw(3) << I << "    "
-			<< "         " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
-			<< " INFINITE ERROR ESTIMATED " <<  endl;
-	  }
-	}
-      }
-    }
-   else
-    {
-     if(idebug)cout << "        " << setw(3) << I
-	  << "         " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
-	  << "     THIS PARAMETER FIXED" << endl;
+                      double PL[], int NN3, double S,
+                      double GT, double AKAPPA, double ALAMBD,
+                      double A[], double SIGMA[], double R[], double Z[]) {
+  if(!idebug) return;
+  cout << " Here " << endl;
+  std::cout << " ITER.NO." << setw(3) << NN3
+            << ", S=" << setiosflags(ios::scientific) << setw(12) << setprecision(5) << S
+            << ", EC =" << setiosflags(ios::scientific) << setw(12) << setprecision(5) << GT
+            << ", KAPPA=" << setiosflags(ios::scientific) << setw(9) << setprecision(4) << AKAPPA
+            << ", LAMBDA=" << setiosflags(ios::scientific) << setw(9) << setprecision(4) << ALAMBD
+            << endl;
+  cout << "      PARAMETER      PARAMETER         STANDARD        CORRELATION "
+       << endl;
+  cout << "        NUMBER        VALUE           DEVIATION          FACTOR "
+       << endl;
+  for(int I = 0; I < M; I++) {
+    if(PL0[I] > .0) {
+      if(PL[I] > .0)
+        cout << "        " << setw(3) << I << "    "
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << SIGMA[I]
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << R[I] << endl;
+      else if(PL[I] == .0)
+        cout << "        " << setw(3) << I << "    "
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << SIGMA[I]
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << R[I]
+             << "  ON BOUNDARY " <<  endl;
+      else if(PL[I] >= -1.)
+        cout << "        " << setw(3) << I << "    "
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << SIGMA[I]
+             << "     " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << R[I]
+             << "  ON BOUNDARY " <<  endl;
+      else
+        cout << "         " << setw(3) << I << "    "
+             << "         " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
+             << " INFINITE ERROR ESTIMATED " <<  endl;
+    } else {
+      cout << "        " << setw(3) << I
+           << "         " << setiosflags(ios::scientific) << setw(12) << setprecision(7) << A[I]
+           << "     THIS PARAMETER FIXED" << endl;
     }
   }
- // Output correlation coefficients
- if(idebug)cout << endl;
+  // Output correlation coefficients
+  cout << endl;
 }
-void monitoVK(double S,int M,int NN3,int IT,double GT,
-	     double AKAPPA,double ALAMBD, double A[],
-	     double SIGMA[], double R[],
-	     double PL0[], double PL[], int ENDFLG, double Z[])
-{
-   int I;
-   if(IT > 0)
-    {
-     if( ENDFLG == 0 && !(NN3%IT))
-	{
-	   print_iteration(  M,  PL0,
-			     PL, NN3,  S,
-			     GT,  AKAPPA,  ALAMBD,
-			     A, SIGMA,  R, Z);
-	   return;
-	}
-     if( NN3 == 0 || ENDFLG == 1)
-	{
-	   print_iteration(  M,  PL0,
-			     PL, NN3,  S,
-			     GT,  AKAPPA,  ALAMBD,
-			     A, SIGMA,  R, Z);
-	}
-     if(ENDFLG < 0)
-	{
-	   // abnormal case
-	   I=-ENDFLG;
-	   switch (I)
-	      {
-	      case 1:
-		 if(idebug)cout <<  " MINIMISATION TERMINATED AS NO FURTHER DECREASE IN S IS OBTAINABLE";
-		 break;
-	      case 2:
-		 if(idebug)cout <<  "  MINIMISATION TERMINATED AS INFINITE ERRORS ESTIMATED ";
-		 break;
-	      case 3:
-		 if(idebug)cout <<  "    MINIMISATION TERMINATED AS ITERATION LIMIT REACHED ";
-		 break;
-	      case 4:
-		 if(idebug)cout <<  "    MINIMISATION TERMINATED AS NEGATIVE OR ZERO Y PERSISTED AS LOGARITHMIC ARGUEMENT ";
-		 break;
-	      }
-	}
-  }
+void monitoVK(double S, int M, int NN3, int IT, double GT,
+              double AKAPPA, double ALAMBD, double A[],
+              double SIGMA[], double R[],
+              double PL0[], double PL[], int ENDFLG, double Z[]) {
+  if(!idebug) return;
+  if(IT <= 0) return;
+  if((ENDFLG == 0 && !(NN3%IT)) || (NN3 == 0 || ENDFLG == 1))
+    print_iteration(M, PL0, PL, NN3, S, GT, AKAPPA, ALAMBD, A, SIGMA, R, Z);
+  else if(ENDFLG == -1)
+    cout <<  " MINIMIZATION TERMINATED AS NO FURTHER DECREASE IN S IS OBTAINABLE";
+  else if(ENDFLG == -2)
+    cout <<  " MINIMIZATION TERMINATED AS INFINITE ERRORS ESTIMATED ";
+  else if(ENDFLG == -3)
+    cout <<  " MINIMIZATION TERMINATED AS ITERATION LIMIT REACHED ";
+  else if(ENDFLG == -4)
+    cout <<  " MINIMIZATION TERMINATED AS NEGATIVE OR ZERO Y PERSISTED AS LOGARITHMIC ARGUEMENT ";
 }
 void Get_dpsis(int nf, int nc, int * ind_new_to_A_User, double ** dpsis_User, double ** dpsis) {
-  for(int j = 0; j < nc;j++) // over constraints
-    for(int i = 0; i < nf + nc;i++)
+  for(int j = 0; j < nc; j++) // over constraints
+    for(int i = 0; i < nf + nc; i++)
       dpsis[j][i] = dpsis_User[j][ind_new_to_A_User[i]];
 }
 
@@ -245,50 +197,15 @@ bool Get_RV_SM( int nf, int nc,
                 double * RV, double ** SM ) {
   double tolerance = 2.2204e-16;
   FSqMtrx m(nc,nc);
-  if(idebug)
-    cout << " Get_RV_SM, nf,nc " << nf << "  " << nc << endl;
   /* Getting QM - last nc terms in each constraint */
   for(int i = 0; i < nc; i++) {
     for(int j = 0;j < nc; j++) {
       m[i][j] = dpsis[i][nf + j] ;
-//       mp[i][j] = m[i][j];
       if(i == j && fabs(m[i][j]) < tolerance)
         return 0;
     }
   }
-  FSqMtrx mp(m);
-
-  if(idebug) {
-    cout << " Get_RV_SM : bef " << endl;
-    for(int i = 0; i < nc; i++) {
-      for(int j = 0; j < nc; j++)
-        cout << m[i][j] << "  " ;
-      cout << endl;
-    }
-    cout << " Get_RV_SM : Determinant " << m.Determinant() << endl;
-  }
   m.Invert();
-  if(idebug) {
-    cout << " Get_RV_SM : aft " << endl;
-    for(int i = 0; i < nc; i++) {
-      for(int j = 0;j < nc; j++)
-        cout << m[i][j] << "  " ;
-      cout << endl;
-    }
-  }
-  if(idebug) {
-    for(int i = 0; i < nc; i++) {
-      cout << " check of inversion: i " << i << "  " ;
-      for(int j = 0; j < nc; j++) {
-        double tt = .0;
-        for(int k = 0; k < nc; k++)
-          tt += m[i][k]*mp[k][j];
-          cout << tt  <<  "  " ;
-      }
-      cout << endl;
-    }
-  }
-
   /* Getting RV, SM */
   for(int i = 0; i < nc; i++) {
     RV[i] = .0;
@@ -300,252 +217,142 @@ bool Get_RV_SM( int nf, int nc,
           SM[i][l] -= m[i][j]*dpsis[j][l];
       }
     }
-  // Check of RV and SM
-  if(idebug) {
-    double RV_Check[nc], SM_Check[nc][nf];
-    cout << " RV_Check, RV: " << endl;
-    for(int i = 0; i < nc; i++) {
-      RV_Check[i] = .0;
-      for(int j = 0; j < nc; j++)
-        RV_Check[i] -= mp[i][j]*RV[j];
-      cout << "i, RV_Check[i], psis[i] - "
-           << i << "  "
-           << RV_Check[i] << "  "
-           << psis[i] << endl;
-    }
-    cout << " SM_Check, SM: " << endl;
-    for(int i = 0; i < nc; i++) {
-      for(int j = 0; j < nf; j++) {
-        SM_Check[i][j] = .0;
-        for(int k = 0; k < nc; k++)
-          SM_Check[i][j] -= mp[i][k]*SM[k][j];
-        cout << "i, j, SM_Check[i][j], dpsis[i][j] - "
-             << i << "  " << j << "  "
-             << SM_Check[i][j] << "  " << dpsis[i][j] << endl;
-      }
-    }
-  }
   return 1;
 }
 void Get_New_Quadratic_Form(int nf, int nc,
                             double * RV,
                             double ** SM, double & S,
                             double G[], double Z[]) {
-   /*
-     nf, nc - number of free parameters and constraints
-     psis,dpsi - vector of constraint values and matrix of constraint derivatives  over all parameters
-     RV - vector of constraint values timed by inverted matrix <-- for control
-     SM - matrix for calculation of errors of substituted parameters
-   */
-   double G_New[PARAMETER_SIZE],Z_New[PARAMETER_SIZE*(PARAMETER_SIZE + 1)/2];
-    /* Now Quadratic_Form */
-   double S_New = S;
-    for(int k = 0;k < nc;k++)
-    {
-       double tt = G[nf+ k] ;
-       for(int l = 0;l < nc;l++)
-	  {
-	     tt +=  0.5*Z[ind((nf+ k),(nf+ l))]*RV[l];//From  Old G,Z
-	  }
-       S_New += RV[k]*tt;
+  /*
+    nf, nc - number of free parameters and constraints
+    psis,dpsi - vector of constraint values and matrix of constraint derivatives  over all parameters
+    RV - vector of constraint values timed by inverted matrix <-- for control
+    SM - matrix for calculation of errors of substituted parameters
+  */
+  double G_New[PARAMETER_SIZE],Z_New[PARAMETER_SIZE*(PARAMETER_SIZE + 1)/2];
+  /* Now Quadratic_Form */
+  double S_New = S;
+  for(int k = 0; k < nc; k++) {
+    double tt = G[nf+ k] ;
+    for(int l = 0; l < nc; l++)
+      tt += 0.5*Z[ind((nf+ k),(nf+ l))]*RV[l]; //From Old G,Z
+    S_New += RV[k]*tt;
+  }
+  /* New Gradient */
+  for(int i = 0; i < nf; i++) {
+    G_New[i] = G[i] ;
+    for(int k = 0; k < nc; k++) {
+      G_New[i] += G[nf+ k]*SM[k][i] ;
+      double tt = Z[ind(nf + k,i)];
+      // From Old Gradient timed by derivaties of substituted parameters overfree
+      for(int l = 0; l < nc; l++)
+        tt += Z[ind(nf + k,nf + l)]*SM[l][i];
+        // From Old Z timed by first derivatives of the expansion
+        // of substituted parameters over free and constraint values
+      G_New[i] += RV[k]*tt;
     }
-    /* New Gradient */
-    for(int i = 0;i < nf;i++)
-    {
-       G_New[i] = G[i] ;
-       for(int k = 0;k < nc;k++)
-	  {
-	     G_New[i] +=  G[nf+ k]*SM[k][i] ;
-	     double tt = Z[ind(nf + k,i)];
-	     // From Old Gradient timed by derivaties of substituted parameters overfree
-	     for(int l = 0;l < nc;l++)
-		{
-		   tt += Z[ind(nf + k,nf + l)]*SM[l][i];
-		   // From Old Z timed by first derivatives  of the expansion of substituted parameters over free and constraint values
-		}
-	     G_New[i] += RV[k]*tt;
-	  }
-       for(int j = 0;j <= i;j++)// Z_New is also symmetrical as Old Z
-	  {
-	     Z_New[ind(i,j)] = Z[ind(i,j)];
-	     for(int k = 0;k < nc;k++)
-		{
-		   Z_New[ind(i,j)] +=   Z[ind(i,nf + k)]*SM[k][j] +Z[ind(nf + k,j)]*SM[k][i] ;
-		   for(int l = 0;l < nc;l++)
-		      {
-			 Z_New[ind(i,j)] += Z[ind(nf + l,nf + k)]*SM[l][j]*SM[k][i];
-		      }
-		}
-
-	  }
+    for(int j = 0; j <= i; j++) { // Z_New is also symmetrical as Old Z
+      Z_New[ind(i,j)] = Z[ind(i,j)];
+      for(int k = 0; k < nc; k++) {
+        Z_New[ind(i,j)] +=   Z[ind(i,nf + k)]*SM[k][j] +Z[ind(nf + k,j)]*SM[k][i] ;
+        for(int l = 0; l < nc; l++)
+          Z_New[ind(i,j)] += Z[ind(nf + l,nf + k)]*SM[l][j]*SM[k][i];
+      }
     }
-    /* Resetting S,G,Z */
-    S = S_New;
-    for(int j = 0;j < nf;j++)
-       {
-	  G[j] = G_New[j];
-       }
-
-    for(int i = 0;i < nf*(nf + 1)/2;i++)
-       {
-	  Z[i]= Z_New[i];
-       }
-
+  }
+  /* Resetting S,G,Z */
+  S = S_New;
+  for(int j = 0; j < nf; j++)
+    G[j] = G_New[j];
+  for(int i = 0; i < nf*(nf+1)/2; i++)
+    Z[i]= Z_New[i];
 }
-void Get_nx(int M_User,int &nx,double PL0_User[],
-	     int *ind_new_to_A_User)
-{
-   int qty_Z = 0;
-   for(int i = 0; i < M_User;i++)// over derivatives in constraint
-      {
-	 if(PL0_User[i] > .0)
-	    {
-	       qty_Z++;
-	    }
-      }
-   nx = M_User - qty_Z;
-   int qty_nx = 0;
-   //   cout << " nx  " << nx << endl;
-   for(int i = 0; i < M_User;i++)// over derivatives in constraint
-      {
-	 if(PL0_User[i] == .0)
-	    {
-	       ind_new_to_A_User[M_User - nx + qty_nx] = i;
-	       qty_nx++;
-	    }
-      }
+void Get_nx(int M_User, int & nx, double PL0_User[],
+            int * ind_new_to_A_User) {
+  int qty_Z = 0;
+  for(int i = 0; i < M_User; i++) // over derivatives in constraint
+    if(PL0_User[i] > .0)
+      qty_Z++;
+  nx = M_User-qty_Z;
+  int qty_nx = 0;
+  for(int i = 0; i < M_User; i++) { // over derivatives in constraint
+    if(PL0_User[i] == .0) {
+      ind_new_to_A_User[M_User-nx+qty_nx] = i;
+      qty_nx++;
+    }
+  }
 }
-void Fill_In_Qty_nc(int nc,int M_User,double PL0_User[],double **dpsis_User,int *Qty_nc)
-{
-   /* Setting to zero */
-   for(int i = 0;i < nc;i++)
-      {
-	 Qty_nc[i] = 0;
-      }
-   for(int i = 0;i < nc;i++)
-      {
-	 for(int j = 0;j < M_User;j++)
-	    {
-	       if(dpsis_User[i][j] != .0 && PL0_User[j] > .0)
-		  {
-		     Qty_nc[i]++;
-		  }
-	    }
-      }
-   if(idebug)cout << " Fill_In_Qty_nc : " << "  ";
-   for(int i = 0;i < nc;i++)
-      {
-	 if(idebug)cout << Qty_nc[i] << "  ";
-	 if(!Qty_nc[i])
-	    {
-	       cout << " fumiliSK: Fill_In_Qty_nc : Constraint number "
-		    << i << " has zero parameter derivatives, terminated  " << endl;
-	       terminate();
-	    }
-      }
-   if(idebug)cout << endl;
+void Fill_In_Qty_nc(int nc, int n, double PL0[], double ** dpsis, int * Qty_nc) {
+  /* Setting to zero */
+  for(int i = 0; i < nc; i++)
+    Qty_nc[i] = 0;
+  for(int i = 0; i < nc; i++)
+    for(int j = 0; j < n; j++)
+      if(dpsis[i][j] != .0 && PL0[j] > .0)
+        Qty_nc[i]++;
+  for(int i = 0; i < nc; i++)
+    if(!Qty_nc[i]) {
+      cout << " fumiliSK: Fill_In_Qty_nc : Constraint number "
+           << i << " has zero parameter derivatives, terminated" << endl;
+      terminate();
+    }
 }
-void Fill_In_Numbers(int nc,int M_User,double PL0_User[],double **dpsis_User,int *Qty_nc,int **Numbers)
-{
-   for(int i = 0;i < nc;i++)
-      {
-	 if(idebug)cout << " Numbers in constraint " << i << "  ";
-	 int jj = 0;
-	 for(int j = 0;j < M_User;j++)
-	    {
-	       if(dpsis_User[i][j] != .0 && PL0_User[j] > .0)
-		  {
-		     Numbers[i][jj] = j;
-		     if(idebug)cout << Numbers[i][jj] << "  ";
-		     jj++;
-		  }
-	    }
-	 if(idebug)cout << endl;
+void Fill_In_Numbers(int nc, int n, double PL0[], double ** dpsis, int ** Numbers) {
+  for(int i = 0; i < nc; i++) {
+    int jj = 0;
+    for(int j = 0; j < n; j++) {
+      if(dpsis[i][j] != .0 && PL0[j] > .0) {
+        Numbers[i][jj] = j;
+        jj++;
       }
+    }
+  }
 }
-void Shift_Indices(int nc,int *Qty_nc,int **Numbers,int *Init_Index,
-		 int *Figures)
-{
-  //cout << " nc, Get " << nc << endl;
+void Shift_Indices(int nc, int * Qty_nc, int ** Numbers, int * Init_Index, int * Figures) {
   // Updating indices
   bool Break = true;
-  int ii = nc - 1;;
-  while(Break && ii >= 0)
-    {
-      if(!(Init_Index[ii] == Qty_nc[ii] - 1) )
-	{
-	  Init_Index[ii]++;
-	  Break = false;
-	}
-      else
-	{
-	  Init_Index[ii] = 0;
-	  ii--;
-	}
+  int ii = nc-1;
+  while(Break && ii >= 0) {
+    if(!(Init_Index[ii] == Qty_nc[ii]-1)) {
+      Init_Index[ii]++;
+      Break = false;
+    } else {
+      Init_Index[ii] = 0;
+      ii--;
     }
+  }
   for(int i = 0; i < nc;i++)
-    {
-      //      cout << Init_Index[i] << "  " ;
-      Figures[i] = Numbers[i][Init_Index[i]];
+    Figures[i] = Numbers[i][Init_Index[i]];
+}
+bool Check_Not_Repeatedness(int nc, int * Figures) {
+  if(nc > 1) {
+    for(int i = 0; i < nc - 1;i++)
+      for(int j = i + 1; j < nc ;j++)
+        if(Figures[i] == Figures[j])
+          return false;
+    return true;
+  }
+  if(nc == 1) return true;
+  return false;
+}
+void Do_Indices_For_Substituted_Parameters (int M_User, int nc, int nx,
+                                            double PL0_User[],
+                                            int * Figures,
+                                            int * ind_new_to_A_User, int * ind_new_to_Z_User) {
+  int M = M_User;
+  for(int qty_nc = 0; qty_nc < nc; qty_nc++) { //over constraint
+    int i_nc = Figures[qty_nc];
+    int qty_Z = 0;
+    for(int i = 0; i < M_User; i++) { // over parameters
+      if(PL0_User[i] > .0) {
+        if(i == i_nc) {
+          ind_new_to_A_User[M  - nx - nc + qty_nc] = i_nc;
+          ind_new_to_Z_User[M  - nx - nc + qty_nc] = qty_Z;
+        }
+        qty_Z++;
+      }
     }
-}
-bool Check_Not_Repeatedness(int nc,int *Figures)
-{
-   if(nc > 1)
-      {
-	 for(int i = 0; i < nc - 1;i++)
-	    {
-	       for(int j = i + 1; j < nc ;j++)
-		  {
-		     //	      cout << i << "  " << j << "  " ;
-		     if(Figures[i] == Figures[j])
-			{
-			   //		  cout << i << "  " << j << "  " ;
-			   return false;
-			}
-		  }
-	    }
-	 return true;
-      }
-   if(nc == 1)return true;
-   return false;
-}
-void Do_Indices_For_Substituted_Parameters(int M_User,int nc,int nx,
-					   double PL0_User[],
-					   int *Figures,
-					   int *ind_new_to_A_User,int *ind_new_to_Z_User)
-{
-   int M = M_User;
-   for(int qty_nc = 0; qty_nc  < nc; qty_nc++)//over constraint
-      {
-	 int i_nc = Figures[qty_nc];
-	 if(idebug)cout << " Do_Indices_For_Substituted_Parameters:qty_nc,Figures[qty_nc]  = " << qty_nc << "  " << Figures[qty_nc]  << endl;
-	 int qty_Z = 0;
-	 for(int i = 0; i < M_User;i++)// over parameters
-	    {
-	       /*
-	       cout << " qty_nc,i,PL0_User[i] = "
-		    << qty_nc << "  " << i
-		    <<  "  " << PL0_User[i]  << endl;
-	       */
-	       if(PL0_User[i] > .0 )
-		  {
-		     if(i == i_nc)
-			{
-			   ind_new_to_A_User[M  - nx - nc + qty_nc] = i_nc;
-			   ind_new_to_Z_User[M  - nx - nc + qty_nc] = qty_Z; 	
-			   if(idebug)
-			   {
-			      cout << i << "  " << PL0_User[i]<< "  " <<qty_nc << "  "
-				   << qty_Z << "  " << ind_new_to_A_User[M  - nx - nc + qty_nc]
-				   << "  " << ind_new_to_Z_User[M  - nx - nc + qty_nc] << "  "
-				   << endl;
-			   }
-			}
-		     qty_Z++;
-		  }
-	    }
-      }
+  }
 }
 
 void Do_Indices_For_Free_Parameters(int M_User, int & qty_nf, int nc, int nx,
@@ -562,12 +369,6 @@ void Do_Indices_For_Free_Parameters(int M_User, int & qty_nf, int nc, int nx,
     if(Free) {
       ind_new_to_A_User[qty_nf] = i;
       ind_new_to_Z_User[qty_nf] = qty_Z; // change 02.09.16
-      if(idebug) {
-        cout << i << "  " << PL0_User[i]<< "  " <<qty_nf << "  "
-              << qty_Z << "  " << ind_new_to_A_User[qty_nf]
-              << "  " << ind_new_to_Z_User[qty_nf] << "  "
-              << endl;
-      }
       qty_nf++;
     }
     qty_Z++;
@@ -584,114 +385,57 @@ void Sort(int nc, int * Original, int * Sorted) {
         Sorted[j] = temp;
       }
 }
-void SelectionDifferentCombinations(int &Qty_Selected,int nc,int **All_Selected_Combinations,
-					int **&SelectedIndices)
-{
-   // When nc > 1 :
-   // At the entry we have All_Selected_Combinations,1-st Qty_Selected are eligible
-   // for further selection, because some of them are just permutations;
-   // from them we should select really different combinations,put them
-   // into SelectedIndices and their Qty into Qty_Selected <-- so it is changed!
-   // Qty_Selected2 - Qty of entries after 2-nd(final) selection
-   // When nc > 1 :
-   int Sorted[Qty_Selected][nc],Qty_Selected2,IndicesOfTaken[Qty_Selected];
-   if(idebug)
-      {
-	 cout << " Qty_Selected,Entries before and after Sort : " << Qty_Selected << endl;
-      }
-   for(int i = 0; i <  Qty_Selected;i++)
-     {
-       Sort(nc,All_Selected_Combinations[i],Sorted[i]);
-       if(idebug)
-	 {
-	   cout << i << "  ";
-	   for(int k = 0; k <  nc;k++)
-	     {
-	       cout << All_Selected_Combinations[i][k] << "  ";
-	     }
-	   for(int k = 0; k <  nc;k++)
-	     {
-	       cout << Sorted[i][k] << "  ";
-	     }
-	   /*
-	    */
-	   cout << endl;
-	 }
-     }
-   IndicesOfTaken[0] = 0;
-   Qty_Selected2 = 1;
-   for(int i = Qty_Selected2; i <  Qty_Selected;i++)// Over All_Selected_Combinations
-     {
-       bool Adding_All = false;
-       for(int j = 0; j <  Qty_Selected2 ;j++)// Over temp
-	 {
-	   bool Adding = true;
-	   for(int k = 0; k <  nc ;k++)
-	     {
-	       Adding = Adding && (Sorted[i][k] ==
-				   Sorted[IndicesOfTaken[j]][k]);
-	     }
-	   Adding_All = Adding_All || Adding;
-	 }
-       if( !Adding_All)
-	 {
-	   IndicesOfTaken[Qty_Selected2] = i;
-	   Qty_Selected2++;
-	 }
-     }
-   // Filling..
-   Qty_Selected = Qty_Selected2;
-   SelectedIndices = new int *[Qty_Selected];
-   if(idebug) cout<< " SelectionDifferentCombinations..,Qty_Selected " <<  Qty_Selected << endl;
-	 for(int i = 0; i <  Qty_Selected;i++)// Over SelectedIndices
-	    {
-	       SelectedIndices[i] = new int[nc];
-	       if(idebug) cout<< " i,SelectionDifferentCombinations..,SelectedIndices " <<  i <<"  " ;
-	       for(int k = 0; k <  nc;k++)
-	    {
-	       SelectedIndices[i][k] = All_Selected_Combinations[IndicesOfTaken[i]][k];
-	       if(idebug) cout <<  SelectedIndices[i][k] <<"  " ;
-	    }
-	 if(idebug) cout << endl;
-      }
+void SelectionDifferentCombinations(int & Qty_Selected, int nc, int ** All_Selected_Combinations,
+                                    int **& SelectedIndices) {
+  // When nc > 1 :
+  // At the entry we have All_Selected_Combinations,1-st Qty_Selected are eligible
+  // for further selection, because some of them are just permutations;
+  // from them we should select really different combinations,put them
+  // into SelectedIndices and their Qty into Qty_Selected <-- so it is changed!
+  // Qty_Selected2 - Qty of entries after 2-nd(final) selection
+  // When nc > 1 :
+  int Sorted[Qty_Selected][nc],Qty_Selected2,IndicesOfTaken[Qty_Selected];
+  for(int i = 0; i <  Qty_Selected;i++)
+    Sort(nc,All_Selected_Combinations[i],Sorted[i]);
+  IndicesOfTaken[0] = 0;
+  Qty_Selected2 = 1;
+  for(int i = Qty_Selected2; i < Qty_Selected; i++) { // Over All_Selected_Combinations
+    bool Adding_All = false;
+    for(int j = 0; j < Qty_Selected2; j++) { // Over temp
+      bool Adding = true;
+      for(int k = 0; k <  nc ;k++)
+        Adding = Adding && (Sorted[i][k] == Sorted[IndicesOfTaken[j]][k]);
+      Adding_All = Adding_All || Adding;
+    }
+    if(!Adding_All) {
+      IndicesOfTaken[Qty_Selected2] = i;
+      Qty_Selected2++;
+    }
+  }
+  // Filling..
+  Qty_Selected = Qty_Selected2;
+  SelectedIndices = new int *[Qty_Selected];
+  for(int i = 0; i < Qty_Selected; i++) { // Over SelectedIndices
+    SelectedIndices[i] = new int[nc];
+    for(int k = 0; k < nc; k++)
+      SelectedIndices[i][k] = All_Selected_Combinations[IndicesOfTaken[i]][k];
+  }
 }
 bool Get_Not_Repeated_Combination(int nc, int *Qty_nc,int **Numbers,
 				  int *Figures,int &Qty_Selected,int **&SelectedIndices)
 {
-  //if(nc < 1)return false;
-
-  if(idebug)cout << " Get_Not_Repeated_Combination:Qty_nc[i] = " ;
-  for(int i = 0; i < nc;i++)
-     {
-	if(idebug)cout << Qty_nc[i] << "  ";
-     }
-  if(idebug)cout << endl;
-  for(int i = 0; i < nc;i++)
-     {
-	if(idebug)cout << "Get_Not_Repeated_Combination: Numbers in constraint  " << i << "  ";
-	for(int j = 0; j < Qty_nc[i];j++)
-	   {
-	      //std::if(idebug)cout << Numbers[i][j] << "  " ;
-	      if(idebug)cout << Numbers[i][j] << "  " ;
-	   }
-	if(idebug)cout << endl;
-     }
   if(nc == 1)
      {
        Qty_Selected = Qty_nc[0];
        // Allocation of SelectedIndices
        SelectedIndices = new int *[Qty_Selected];
-       if(idebug) cout<< " Get_Not_Repeated_Combination..,Qty_Selected " <<  Qty_Selected << endl;
        for(int i = 0; i <  Qty_Selected;i++)// Over SelectedIndices
 	 {
 	   SelectedIndices[i] = new int[nc];
-	   if(idebug) cout<< " i,Get_Not_Repeated_Combination..,SelectedIndices " <<  i <<"  " ;
 	   for(int k = 0; k <  nc;k++)
 	     {
 	       SelectedIndices[i][k] = Numbers[k][i];
-	       if(idebug) cout << SelectedIndices[i][k] <<"  " ;
 	     }
-	   if(idebug) cout << endl;
 	 }
        return true;
      }
@@ -712,42 +456,27 @@ bool Get_Not_Repeated_Combination(int nc, int *Qty_nc,int **Numbers,
 	All_Selected_Combinations[i] = new int[nc];
      }
 
-  if(idebug)cout << " Get_Not_Repeated_Combination:Total_Number = " << Total_Number << endl;
   Qty_Selected = 0;
   for(int i = 0;i < Total_Number ;i++)
      {
 	if(Check_Not_Repeatedness(nc,Figures))
 	   {
-	      if(idebug)cout << " Get_Not_Repeated_Combination: Qty_Selected  Figures[j]:  " << Qty_Selected << "  " ;
 	      for(int j = 0;j < nc;j++)
 		 {
 		    All_Selected_Combinations[Qty_Selected][j] = Figures[j];
-		    if(idebug)cout << All_Selected_Combinations[Qty_Selected][j] << "  ";
 		 }
-	      if(idebug)cout << endl;
 	      Qty_Selected++;
 	      //delete Init_Index;
 	      //return true;
 	   }
 	Shift_Indices(nc,Qty_nc,Numbers,Init_Index,Figures);
      }
-  if(idebug)cout << "**************************" << endl;
   // Before this call Qty_Selected - combinations
   // after 1-st selection : list may contain the same permutated combinations
   // 2-nd selection : leave only one combination from permutated
   SelectionDifferentCombinations(Qty_Selected,nc,
 				 All_Selected_Combinations,
 				 SelectedIndices);
-  if(idebug) cout << " After SelectionDifferentCombinations,Qty_Selected "
-		  << Qty_Selected << endl;
-  for(int i = 0; i < Qty_Selected;i++)
-     {
-	for(int k = 0; k < nc;k++)
-	   {
-	      if(idebug) cout << SelectedIndices[i][k] << "  ";
-	   }
-	if(idebug) cout << endl;
-     }
   /*
   */
   // Afte this call Qty_Selected changed !
@@ -758,7 +487,6 @@ bool Get_Not_Repeated_Combination(int nc, int *Qty_nc,int **Numbers,
      }
   delete All_Selected_Combinations ;
   delete Init_Index;
-  if(idebug)cout << "**************************" << endl;
   // Here we have Combinations regardless their productions, their number is Qty_Selected
   // now we should take combinations with different productions
   return true;
@@ -789,87 +517,48 @@ void SelectFigures(int Qty_Selected,int **SelectedIndices,double *DeterminantVal
    for(int j = 0; j < nc;j++)
       {
 	 Figures[j] = SelectedIndices[i_Selected][j];
-	 //if(idebug) cout << m[i][j] << "  ";
       }
-   if(idebug) cout << " i_Selected,BiggestDeterminant by module " << i_Selected << "  "
-		   << DeterminantValues[i_Selected] << endl;;
 }
-void Do_Figures(int nc,int M_User,double PL0_User[],double **dpsis_User,int *Figures)
-{
-
-   int *Qty_nc;
-   Qty_nc = new int[nc];
-   Fill_In_Qty_nc(nc,M_User,PL0_User,dpsis_User,Qty_nc);// to find qty of parameters, not fixed by user and having nonzero derivatives
-   int **Numbers;
-   Numbers = new int*[nc];
-   for(int i = 0; i < nc;i++)
-      {
-	 Numbers[i] = new int[Qty_nc[i]];
-      }
-   Fill_In_Numbers(nc,M_User,PL0_User,dpsis_User,Qty_nc,Numbers);// Nomera parametrov, for which nonzero derivatives
-   int Qty_Selected,**SelectedIndices;//Qty_Selected - number
-   // of combinations after
-   // two selections :
-   //1-st : to produce list of parameters, when each entry
-   // does not contain the same parameter more than one time;
-   //2 -nd : to produce list of parameters, when each entry
-   // contains unique combination of parameters;
-   // Array SelectedIndices is being created in SelectionDifferentCombinations,
-   // called by Get_Not_Repeated_Combination and has Qty_Selected entries
-   if(!Get_Not_Repeated_Combination(nc, Qty_nc,Numbers,Figures,
-				    Qty_Selected,SelectedIndices))
-      {
-	 if(idebug)cout << " Do_Figures:Problem is poorly defined : constraints are linearly dependent,terminated " << endl;
-	 terminate();
-      }
-   //if(idebug) cout << " Returned Qty_Selected,SelectedIndices " << endl;
-   if(idebug) cout << " Returned Qty_Selected " << Qty_Selected << endl;
-   //SecondSelectionByFiguresProduction(Qty_Selected,nc,SelectedIndices);
-   if(idebug) cout << " Returned SelectedIndices and Determinant : "  << endl;
-   double *DeterminantValues = new double[Qty_Selected];
-
-   if(nc > 1)
-     {
-       for(int j = 0; j < Qty_Selected;j++)
-	 {
-	   if(idebug) cout << j << "  " ;
-	   for(int i = 0; i < nc;i++)
-	     {
-	       if(idebug) cout  << SelectedIndices[j][i] << "  ";
-	     }
-	     GetDeterminant(dpsis_User,nc,SelectedIndices[j],DeterminantValues[j]);
-	     if(idebug) cout << DeterminantValues[j] << endl;
-	   }
-     }
-   if(nc == 1)
-     {
-       for(int j = 0; j < Qty_Selected;j++)
-	 {
-	   DeterminantValues[j] = dpsis_User[0][SelectedIndices[j][0]];
-	   if(idebug) cout << j << "  " << SelectedIndices[j][0] << "  " << DeterminantValues[j] << endl;
-
-	 }
-    }
-   if(idebug) cout << endl;
-   SelectFigures(Qty_Selected,SelectedIndices,DeterminantValues,nc,Figures);
-   if(idebug) cout << " Selected Figures " << endl;
-   for(int i = 0; i < nc;i++)
-      {
-	 if(idebug) cout <<Figures[i] << "  " ;
-      }
-   if(idebug) cout << endl;;
-   for(int j = 0; j < Qty_Selected;j++)
-      {
-	 delete SelectedIndices[j];
-      }
-   delete SelectedIndices;
-   delete DeterminantValues;
-   for(int i = 0; i < nc;i++)
-      {
-	 delete Numbers[i];
-      }
-   delete Qty_nc;
-   delete Numbers;
+void Do_Figures(int nc, int M_User, double PL0_User[], double ** dpsis_User, int * Figures) {
+  int * Qty_nc;
+  Qty_nc = new int[nc];
+  Fill_In_Qty_nc(nc, M_User, PL0_User, dpsis_User, Qty_nc);
+  // to find qty of parameters, not fixed by user and having nonzero derivatives
+  int ** Numbers;
+  Numbers = new int*[nc];
+  for(int i = 0; i < nc;i++)
+    Numbers[i] = new int[Qty_nc[i]];
+  Fill_In_Numbers(nc, M_User, PL0_User, dpsis_User, Numbers); // Nomera parametrov, for which nonzero derivatives
+  int Qty_Selected, ** SelectedIndices; // Qty_Selected - number
+  // of combinations after
+  // two selections :
+  //1-st : to produce list of parameters, when each entry
+  // does not contain the same parameter more than one time;
+  //2 -nd : to produce list of parameters, when each entry
+  // contains unique combination of parameters;
+  // Array SelectedIndices is being created in SelectionDifferentCombinations,
+  // called by Get_Not_Repeated_Combination and has Qty_Selected entries
+  if( !Get_Not_Repeated_Combination(nc, Qty_nc, Numbers, Figures,
+                                    Qty_Selected, SelectedIndices) ) {
+    cout << " Do_Figures: Problem is poorly defined: constraints are linearly dependent, terminated " << endl;
+    terminate();
+  }
+  double * DeterminantValues = new double[Qty_Selected];
+  if(nc > 1)
+    for(int j = 0; j < Qty_Selected;j++)
+      GetDeterminant(dpsis_User,nc,SelectedIndices[j],DeterminantValues[j]);
+  if(nc == 1)
+    for(int j = 0; j < Qty_Selected;j++)
+      DeterminantValues[j] = dpsis_User[0][SelectedIndices[j][0]];
+  SelectFigures(Qty_Selected,SelectedIndices,DeterminantValues,nc,Figures);
+  for(int j = 0; j < Qty_Selected;j++)
+    delete SelectedIndices[j];
+  delete SelectedIndices;
+  delete DeterminantValues;
+  for(int i = 0; i < nc;i++)
+    delete Numbers[i];
+  delete Qty_nc;
+  delete Numbers;
 }
 void Get_Index_Functions (int M, int nf, int nc, int nx,
                           double A_User[], double PL0_User[],
@@ -917,33 +606,13 @@ void Get_Index_Functions (int M, int nf, int nc, int nx,
   Do_Figures(nc, M_User,PL0_User,dpsis_User,Figures);
   Do_Indices_For_Substituted_Parameters(M_User,nc,nx,PL0_User,Figures,
                                         ind_new_to_A_User,ind_new_to_Z_User);
-
-  if(idebug) {
-    cout << " Indices after ..Substituted..,1-st A,2-nd - Z " << endl;
-    for (int i = 0; i < M_User; i++)
-      cout << " i, ind_new_to_A_User " << i << "  " << ind_new_to_A_User[i] << endl;
-    cout << "**********************************" << endl;
-    for (int i = 0; i < M_User-nx; i++)
-      cout << " i, ind_new_to_Z_User " << i << "  " << ind_new_to_Z_User[i] << endl;
-    cout << "**********************************" << endl;
-  }
-
   Do_Indices_For_Free_Parameters (M_User,nf,nc,nx,PL0_User,Figures,
                                   ind_new_to_A_User,ind_new_to_Z_User);
   // Index for Z - we are ready for its creation
-  if(idebug) {
-    cout << " Indices after ..Free..,1-st A,2-nd - Z  " << endl;
-    for (int i = 0; i < M_User;i++)
-      cout << " i, ind_new_to_A_User " << i << "  " << ind_new_to_A_User[i] << endl;
-    cout << "**********************************" << endl;
-    for (int i = 0; i < M_User - nx;i++)
-      cout << " i, ind_new_to_Z_User " << i << "  " << ind_new_to_Z_User[i] << endl;
-    cout << "**********************************" << endl;
-  }
   // exit if qty_ind_nc != nc
   if (nf + nc + nx != M_User) {
     cout << " terminated due to nf + nc + nx != M_User "
-        << endl;
+         << endl;
     terminate();
   }
   delete [] Figures;
@@ -954,7 +623,6 @@ void Get_SIGMA_R_VL_User(int M_User,int nf,int nc,
 			     double SIGMA_User[], double R_User[],double VL_User[])
 {
    /* Cleaning VL_User */
-   if(idebug)cout << " Get_SIGMA_R_VL_User : " << endl;
    for(int i = 0; i < M_User;i++)
       {
 	 SIGMA_User[i] = .0;
@@ -978,7 +646,6 @@ void Get_SIGMA_R_VL_User(int M_User,int nf,int nc,
       {
 	 SIGMA_User[i] = sqrt(VL_User[ind(i,i)]);
  	 R_User[i] = R_User[i]*VL_User[ind(i,i)];
-	 if(idebug)cout <<  setiosflags(ios::scientific) << i << "  " << VL_User[ind(i,i)] << endl;
      }
 }
 void Get_PL0_PL_User(int nf,int *ind_new_to_A_User,
@@ -1025,82 +692,26 @@ void Set_Everything_As_Without_Constraints(int M_User,int &M,
       }
 
 }
-bool Rearrange_S_G_Z(double A_User[],
-			 int nf,int nc,int nx,
-			 int *ind_new_to_A_User,int *ind_new_to_Z_User,
-			 double *psis,double **dpsis_User,double **dpsis,
-			 double *RV,double **SM,
-			 double &S,
-			 double G_User[],double G[],
-			 double Z_User[],double Z[])
-{
-   //double G_Pure[PARAMETER_SIZE],Z_Pure[PARAMETER_SIZE*(PARAMETER_SIZE + 1)/2];
-   if(idebug)cout << " nf,nc " << nf << "  " << nc << endl;
-   if(idebug)cout << " Rearrange_S_G_Z:Before Get_dpsis " << endl;
-   if(idebug)cout << " j,ind_new_to_A_User.. "  << endl;
-   for(int j = 0; j < nf + nc + nx;j++)
-      {
-	 if(idebug)cout << j << "  "<< ind_new_to_A_User[j] << endl;
-      }
-   if(idebug)cout << endl;
-   for(int i = 0; i < nc;i++)
-      {
-	 if(idebug)cout << " i_nc, psis,dpsis_User.. " << i << "  "<< psis[i] << "  ";
-	 for(int j = 0; j < nf + nc + nx;j++)
-	    {
-	       //   if(idebug)cout << fixed << dpsis_User[i][j]  << "  ";
-	       if(idebug)cout << dpsis_User[i][j]  << "  ";
-	    }
-	 if(idebug)cout << endl;
-      }
-   Get_dpsis(nf,nc,ind_new_to_A_User,dpsis_User,dpsis);
-   if(idebug)cout << " Rearrange_S_G_Z:After Get_dpsis " << endl;
-   for(int i = 0; i < nc;i++)
-      { if(idebug)cout << " i_nc, psis,dpsis.. " << i << "  "<< psis[i] << "  ";
-	 for(int j = 0; j < nf + nc;j++)
-	    {
-	       if(idebug)cout  << dpsis[i][j]  << "  ";
-	    }
-	 if(idebug)cout << endl;
-      }
-   if(idebug)cout << " Rearrange_S_G_Z:before  Get_RV_SM: nf,nc  " << nf << "  " << nc << endl;
-   if(Get_RV_SM(nf,nc,psis,dpsis,RV,SM))
-      {
-	 if(idebug)cout << " Rearrange_S_G_Z:After Get_RV_SM " << endl;
-	 for(int i = 0; i < nc;i++)
-	    { if(idebug)cout << " i, RV[i],SM.. " << setiosflags(ios::scientific) << i << "  "<< RV[i] << "  ";
-	       for(int j = 0; j < nf;j++)
-		  {
-		     if(idebug)cout << SM[i][j]  << "  ";
-		  }
-	       if(idebug)cout << endl;
-	    }
-	 print(" Rearrange_S_G_Z:G_User, Bef Reindexing : ",nf + nc + nx,G_User);
-	 print_Z(" Rearrange_S_G_Z:Z_User , Bef Reindexing ",nf + nc,Z_User);
-	 /* Take out possible fixed parameter from G_User,Z_User */
-	 for(int i = 0; i < nf + nc +nx;i++)
-	    {
-	       G[i] = G_User[ind_new_to_A_User[i]];
-	    }
-	 for(int i = 0; i < nf + nc;i++)
-	    {
-	       for(int j = 0; j <= i;j++)
-		  {
-		     Z[ind(i,j)] = Z_User[ind(ind_new_to_Z_User[i],ind_new_to_Z_User[j])];
-		  }
-	    }
-         if(idebug)cout << " Rearrange_S_G_Z : S Bef Quad " << S << endl;
-	 print(" Rearrange_S_G_Z:G_User, Aft Reindexing : ",nf + nc,G);
-	 print_Z(" Rearrange_S_G_Z:Z_User , Aft Reindexing ",nf + nc,Z);
-	 Get_New_Quadratic_Form(nf,nc,
-				RV,SM,
-				S,G,Z);//S,G,Z - now new
-         if(idebug)cout << " Rearrange_S_G_Z : S Aft Quad " << S << endl;
-	 print(" Rearrange_S_G_Z:Aft New_Quadratic : G   " , nf ,G);
-	 print_Z(" Rearrange_S_G_Z:Aft New_Quadratic : Z " , nf,Z);
-	 return 1;
-      }
-   else return 0;
+bool Rearrange_S_G_Z (double A_User[],
+                      int nf,int nc,int nx,
+                      int *ind_new_to_A_User,int *ind_new_to_Z_User,
+                      double *psis,double **dpsis_User,double **dpsis,
+                      double *RV,double **SM,
+                      double &S,
+                      double G_User[],double G[],
+                      double Z_User[],double Z[]) {
+  Get_dpsis(nf,nc,ind_new_to_A_User,dpsis_User,dpsis);
+  if(Get_RV_SM(nf,nc,psis,dpsis,RV,SM)) {
+    /* Take out possible fixed parameter from G_User,Z_User */
+    for(int i = 0; i < nf + nc +nx;i++)
+          G[i] = G_User[ind_new_to_A_User[i]];
+    for(int i = 0; i < nf + nc;i++)
+          for(int j = 0; j <= i;j++)
+                Z[ind(i,j)] = Z_User[ind(ind_new_to_Z_User[i],ind_new_to_Z_User[j])];
+    Get_New_Quadratic_Form(nf, nc, RV, SM, S, G, Z); // S,G,Z - now new
+    return 1;
+  }
+  return 0;
 }
 void Get_New_A_User(int nf,int nc,double *RV,double **SM,double A[],double DA[],
 		    int *ind_new_to_User,double A_User[])
@@ -1255,47 +866,19 @@ int fumiliSK( int M_User, double & S_User, int N1, int N2, int N3, double EPS,
    double AMX[PARAMETER_SIZE], AMN[PARAMETER_SIZE];
    double RP = 1.e-15;
    INDFLG[2] = 0;// Why?
-   if(idebug)cout << " At the entry to  fumiliSK:M_User,nc "
-	<<  M_User << "  " << nc  << endl;
-   if(idebug && ind_new_to_A_User) cout << " Pointer ind_new_to_A_User not zero " << endl;
-   for(int i = 0; i <  M_User; i++)
-      {
-	 if(idebug)cout << " i,original A_User,min,max. .. " << i  << "  " << A_User[i] << "  " << AMN_User[i] << "  "
-	      << AMX_User[i] << "  " << PL0_User[i] << endl;
-      }
    if(nc) // Keep in mind that there is special logic when nc = M
       {
 	 ind_new_to_A_User  = new int[M_User];
-	 if(idebug)
-	    {
-	       cout << " Original ind_new_to_A_User " << endl;
-	    }
 	 for (int i = 0; i < M_User;i++)
 	    {
 	       ind_new_to_A_User[i] = -1;
-	       if(idebug)
-		  {
-		     cout << " i, ind_new_to_A_User " << i << "  " << ind_new_to_A_User[i] << endl;
-		  }
 	    }
 	 Get_nx(M_User,nx,PL0_User,ind_new_to_A_User);// finds the number of fixed by user parameters and sets pointers to them
 
 	 if(nc > M_User - nx)
 	    {
-	       if(idebug)cout << " fumiliSK: terminated due to number of  nonfixed parameters less than constraints " << endl;
+	       cout << " fumiliSK: terminated due to number of nonfixed parameters less than constraints " << endl;
 	       terminate();
-	    }
-	 //	 if(first)
-	 if(idebug)
-	    {
-	       cout << "  ind_new_to_A_User after Get_nx " << endl;
-	    }
-	 for (int i = 0; i < M_User;i++)
-	    {
-	       if(idebug)
-		  {
-		     cout << " i, ind_new_to_A_User " << i << "  " << ind_new_to_A_User[i] << endl;
-		  }
 	    }
 	 nf = M_User - nx - nc;
 	 ind_new_to_Z_User = new int[M_User - nx];
@@ -1310,27 +893,11 @@ int fumiliSK( int M_User, double & S_User, int N1, int N2, int N3, double EPS,
 	    {
 	       dpsis_User[i] = new double[M_User]; // M is not yet changed!!
 	    }
-	 if(idebug)cout << " FUM : bef get_psis_and_derivatives " << endl;
 	 get_psis_and_derivatives(M_User,A_User,
 				  psis,dpsis_User);
-	 //	       check_derivatives(
-	 if(idebug)cout << " FUM : aft get_psis_and_derivatives " << endl;
 	 Get_Index_Functions(M_User,nf,nc,nx,A_User,PL0_User,
 			     psis,dpsis_User,
 			     ind_new_to_A_User,ind_new_to_Z_User);
-	 if(idebug)cout << "  fumiliSK: M_User, nf, nc,nx " << M_User
-			<< "  " <<  nf << "  " <<  nc << "  " << nx << endl;
-	 if(idebug)cout << "  fumiliSK: ind_new_to_A_User: " << endl;
-	 for(int i = 0; i < M_User;i++)
-	    {
-	       if(idebug)cout << ind_new_to_A_User[i]  << endl;
-	    }
-	 if(idebug)cout << "  fumiliSK: ind_new_to_Z_User,: " << endl;
-	 for(int i = 0; i < M_User - nx;i++)
-	    {
-	       if(idebug)cout << ind_new_to_Z_User[i]  << endl;
-	    }
-	 //	       terminate();
 	 RV = new double[nc];
 	 ZV = new double[nc] ;
 	 SM = new double*[nc];
@@ -1352,11 +919,7 @@ int fumiliSK( int M_User, double & S_User, int N1, int N2, int N3, double EPS,
 					       AMX_User,AMX,
 					       AMN_User,AMN,
 					       PL0_User,PL0);
-	 print (" A_User                 A ",M_User,A_User,A);
-	 print (" AMX_User                 AMX ",M_User,AMX_User,AMX);
-	 print (" AMN_User                 AMN ",M_User,AMN_User,AMN);
-	 print (" PL0_User                 PL0 ",M_User,PL0_User,PL0);
-	 if(nf == 0)M = nc;
+	 if(nf == 0) M = nc;
 	 else M = nf;
       }
    else
@@ -1367,14 +930,6 @@ int fumiliSK( int M_User, double & S_User, int N1, int N2, int N3, double EPS,
 					      AMX_User,AMX,
 					      AMN_User,AMN,
 					      PL0_User,PL0);
-
-	 if(idebug)cout << " Working M = " << M << endl;
-	 for(int i = 0; i < M;i++)
-	    {
-	       if(idebug) cout   << " i,working A,min,max. .. " << i  << "  "
-				 << A[i] << "  " <<  AMN[i] << "  "
-				 << AMX[i] << "  " << PL0[i] << endl;
-	    }
       }
    /* Change dimensionality of problem */
 
@@ -1416,89 +971,16 @@ L4:
     {
         for (I = 0; I < NN0; I++) Z[I] = 0.;
     }
-  //INDFLG[0] = 0;
-  INDFLG[0] = -1;// My change : 05.05.14
+  INDFLG[0] = -1; // My change : 05.05.14
   int ijkl;
-  if(idebug)cout << " Bef SGZ:NN3,Number of Free parameters " << NN3 << "  " << M << endl;
   if(nc) {
     ijkl = SGZ(M_User, S_User, A_User, PL0_User, G_User, Z_User);
-    //cout << "ijkl " << ijkl << endl;
     if(!ijkl)return -1;
     S = S_User;
-    if(idebug) cout << " S,G_User,Z_User: " << endl;
-    if(idebug) cout << " S_User, Bef Rearrange_S_G_Z = " << S_User << endl;
-    print("  G_User, Bef Rearrange_S_G_Z ", M_User, G_User);
-    print_Z(" Z_User, Bef Rearrange_S_G_Z ", M_User-nx, Z_User);
     get_psis_and_derivatives(nf + nc + nx, A_User, psis, dpsis_User);
-    //cout << " psis " << psis[0] << endl;
-    if(idebug) {
-      // Errors - error  for fixed parameters are zeroes, for others - from matrix
-      FSqMtrx Z0_Temp(nf+nc, nf+nc);
-      double Errors[M_User];
-      cout << "Z0_Temp : " << endl;
-      for(int i = 0; i < nf+nc; i++) {
-        cout << " i = " << i << "  ";
-        for(int j = 0; j <= i; j++) {
-          Z0_Temp[i][j] = Z_User[ind(ind_new_to_Z_User[i],ind_new_to_Z_User[j])];
-          cout << Z0_Temp[i][j] << "  ";
-        }
-        cout << endl;
-      }
-      Z0_Temp.Invert();
-      cout << " Experimental Errors : " << endl;
-      for(int i = 0; i < nf+nc; i++)
-        Errors[ind_new_to_A_User[i]] = sqrt(Z0_Temp[i][i]);
-      for(int i = nf+nc; i < M_User; i++)
-        Errors[ind_new_to_A_User[i]] = .0;
-      for(int i = 0; i < M_User;i++)
-        cout << "i, Error " << i << "  " << Errors[i] << endl;
-      double * psis_T = new double[nc];
-      double ** dpsis_T = new double*[nc];
-      for(int i = 0; i < nc;i++)
-        dpsis_T[i] = new double[M_User]; // M is not yet changed!!
-      cout << " Check of derivatives : " << endl;
-      double Der[nc][M_User], A_Temp[M_User];
-      for(int i = 0; i < M_User; i++) {
-        for(int l = 0; l < M_User;l++)
-          A_Temp[l] = A_User[l];
-        if(Errors[i] != .0)
-          A_Temp[i] = A_Temp[i] + 0.00001*Errors[i];
-        else
-          A_Temp[i] = A_Temp[i];
-        get_psis_and_derivatives(nf + nc + nx,A_Temp,psis_T,dpsis_T);
-        for(int k = 0; k < nc; k++) {
-          if(Errors[i] != .0)
-            Der[k][i] = (psis_T[k] -psis[k])/( 0.00001*Errors[i]);
-          else
-            Der[k][i] = .0;
-        }
-      }
-      for(int k = 0; k < nc; k++) {
-        for(int i = 0; i < M_User; i++) {
-          if(Errors[i] != .0) {
-            cout << "nc, i, Der, dpsis " << k << "  " << i << "  "
-                 << Der[k][i] << "  " << dpsis_User[k][i] << "  "
-                 << fabs(Der[k][i]-dpsis_User[k][i])/Errors[i] << endl;
-          } else {
-            cout << "nc,i " <<  k << "  " << i << " This parameter fixed " << endl;
-          }
-        }
-        cout << "********************************" << endl;
-      }
-      for(int i = 0; i < nc;i++)
-        delete [] dpsis_T[i]; // M is not yet changed!!
-      delete [] dpsis_T;
-      delete [] psis_T;// Inserted by VK(30.05.16)
-    }
     if( Rearrange_S_G_Z(A_User, nf, nc, nx, ind_new_to_A_User, ind_new_to_Z_User,
                         psis, dpsis_User, dpsis, RV, SM, S, G_User, G, Z_User, Z) ) {
       /* Saving terms for calculation of R for Substituted_Parameters */
-      if(idebug) cout << " S_User, Aft Rearrange_S_G_Z = " << S_User << endl;
-      print("  G_User, Aft Rearrange_S_G_Z ", M_User, G_User);
-      print_Z(" Z_User, Aft Rearrange_S_G_Z ", M_User, Z_User);
-      if(idebug) cout << " S, Aft Rearrange_S_G_Z = " << S << endl;
-      print("  G, Aft Rearrange_S_G_Z ", M, G);
-      print_Z(" Z, Aft Rearrange_S_G_Z ", M, Z);
       for(int k = 0; k <  nc; k++) // index of row
         ZV[k] = Z[ind(nf+ k,nf + k)];
     } else {
@@ -1526,7 +1008,6 @@ L4:
 	 if (NN1 <= N1)
 	    {
 	       T = 2.*(S - OLDS - GT);
-	       if(idebug)cout << "NN3,NN1,alpha,INDFLG[0] " << NN3 << "  " << NN1 << "  " << (S - OLDS)/(- GT) << "  " << INDFLG[0] << endl;
 	       if (INDFLG[0] == -1)
 		  {
 		     if (fabs(S - OLDS) <= SP && -GT <= SP)goto L19;
@@ -1538,24 +1019,6 @@ L4:
 	       GT = GT * T;
 	       T1 = T1 * T;
 	       NN2 = 0;
-	       if(nc)
-		  {
-		     if(idebug)cout << " Bef step division : M_User,M,nf,nc,j,ind_new_to_A_User.. "
-			  << M_User << "  " << M << "  " << nf << "  " << nc << endl;
-		     for(int j = 0; j < nf + nc + nx;j++)
-			{
-			   if(idebug)cout << j << "  "<< ind_new_to_A_User[j] << endl;
-			}
-		     if(idebug)cout << endl;
-		     for(int i = 0; i < nc;i++)
-			{ if(idebug)cout << " Bef step division  : i, RV[i],SM.. " << i << "  "<< RV[i] << "  ";
-			   for(int j = 0; j < nf;j++)
-			      {
-				 if(idebug)cout << SM[i][j]  << "  ";
-			      }
-			   if(idebug)cout << endl;
-			}
-		  }
 	       for (I = 0; I < N; I++)
 		  {
 		     if (PL[I] > 0.)
@@ -1650,7 +1113,6 @@ L19:
 				 {
 				    if(ind_Z0[I] == -1 || ind_Z0[J] == -1)
 				       {
-					  if(idebug)cout << " terminated due to wrong ind_Z0 " << endl;
 					  terminate();
 				       }
 				    Z[K2] = Z0[ind(ind_Z0[I],ind_Z0[J])];
@@ -1675,17 +1137,11 @@ L19:
    int L1, K, IFIX;
    double BI, AIMAX, AMB;
    N0 = I1 - 1;
-   if(idebug)cout << " Bef mconvd : " << endl;
-   if(idebug)cout << " N0 = " <<  N0 << endl;
    for(int i = 0; i < N0*(N0 + 1)/2;i++)
       {
 	 Z0_T[i] = Z[i];
       }
-   print_Z(" Z0_T Bef ",N0,Z0_T);
-   print(" R Bef ",N,R);
-   print(" PL Bef ",N,PL);
    mconvd(N0, Z, R, PL, INDFLG);
-   if(idebug)cout << " INDFLG[0],INDFLG[1],Aft " << INDFLG[0] << "  " << INDFLG[1] << endl;
    if (INDFLG[0] != -1)
       {
 	 INDFLG[0] = -1;
@@ -1698,7 +1154,6 @@ L19:
    print(" PL Aft ",N,PL);
    for(int i = 0;i < N0;i++)
       {
-	 if(idebug)cout << " check of inversion: i " << i << "  " ;
 	 for(int j = 0;j < N0;j++)
 	    {
 	       double tt = .0;
@@ -1707,9 +1162,7 @@ L19:
 		     tt +=Z0_T[ind(i,k)]* Z[ind(k,j)];
 
 		  }
-	       if(idebug)cout << tt  <<  "  " ;
 	    }
-	 if(idebug)cout << endl;
       }
    I1 = 1;
    for (I = 0; I < N; I++)
@@ -1760,11 +1213,6 @@ L19:
 	       L = L + I1;
 	    }
       }
-   if(idebug)cout << " N " << N << endl;
-   if(idebug)cout << " IFIX " << IFIX << endl;
-   print(" DA ",N,DA);
-   print(" R  ",N,R);
-   print(" SIGMA ",N,SIGMA);
   if (IFIX != -1)
       {
 	 PL[IFIX] = -1.;
@@ -1805,10 +1253,6 @@ L19:
 			{
 			   IMAX = I;
 			   AIMAX = ABI;
-			   if(idebug)cout << " IMAX,AIMAX,BI,DA[IMAX],ALAMBD,AL  "
-					  << IMAX<< "  " << AIMAX << "  " << BI << "  "
-					  << DA[IMAX] <<  "  "
-					  << ALAMBD <<  "  " << AL << endl;
  			   ALAMBD = AL;
 			}
 		  }
@@ -1842,15 +1286,7 @@ L19:
    if (IMAX >= 0)
       {
 	 DA[IMAX] = AIMAX - A[IMAX];
-	 if(idebug)cout << " IMAX,DA[IMAX],ALAMBD,NN2,N2  " << IMAX<< "  " << DA[IMAX] <<  "  "
-			<< ALAMBD <<  "  " << NN2 <<  "  " << N2 << endl;
       }
-   print(" DA[IMAX] ",N,DA);
-
-   if(idebug)cout << "Bef block- ENDFLG,N,T1,GT,IMAX,IFIX,IFIX1,ALAMBD,AKAPPA " << ENDFLG << "  " << N << "  " << T1 << "  " << GT << "  " << IMAX << "  " << IFIX<< "  " << IFIX1<< "  " <<  ALAMBD << "  " << AKAPPA << endl;
-   if(idebug)cout << "Bef block- EPS,FIXFLG,FI,INDFLG[0], INDFLG[1] " << EPS << "  " << FIXFLG << "  " << FI << "  " << INDFLG[0] << "  " <<  INDFLG[1]<< endl;
-   print(" DA ",N,DA);
-   print(" PL  ",N,PL);
 
     // Begin block 6
 
@@ -1911,7 +1347,6 @@ L19:
 	    }
       }
 L85:
-   if(idebug)cout << " Aft block-ENDFLG,N,T1,GT,IMAX,IFIX,IFIX1,ALAMBD,AKAPPA " << ENDFLG << "  " << N << "  " << T1 << "  " << GT << "  " << IMAX << "  " << IFIX<< "  " << IFIX1<< "  " <<  ALAMBD << "  " << AKAPPA << endl;
    if (ENDFLG == 0 && NN3 >= N3) ENDFLG = -3;
    if (ENDFLG > 0 && INDFLG[1] > 0) ENDFLG = -2;
    //MONITO (S,M,NN3,IT,EPS,GT,AKAPPA,ALAMBD);
@@ -1919,38 +1354,15 @@ L85:
      07.002.14(VK):
      Change to do prints of iteration
     */
-   //   if(ijkl  == 2)
-   //    if(SGZ  == SGZ_Two_STT_Tracks)
-   if(idebug)cout << " M " << M << endl;
    Calculate_Full_Matrix_For_Free_Parameters(M,PL, Z,VL);
-   print_Z(" Full Matrix ",M,VL);
    if(nc )
       {
-	 if(idebug)cout << " RV,SM  Bef Full_Matrix " << endl;
-	 for(int i = 0; i < nc;i++)
-	    { if(idebug)cout << " i, RV[i],SM.. " << i << "  "<< RV[i] << "  ";
-	       for(int j = 0; j < nf;j++)
-		  {
-		     if(idebug)cout << SM[i][j]  << "  ";
-		  }
-	       if(idebug)cout << endl;
-	    }
 	 Calculate_Full_Matrix_For_Substituted_Parameters(nf,nc,SM,VL);
-	 //	 	 std::if(idebug)cout << " DMONIT, " << endl;
-	 print_Z(" VL  after Calculate_Full_Matrix_For_Substituted_Parameters ",nf + nc,VL);
-	 print(" ind_new_to_Z_User bef Get_SIGMA_R_VL_User ",nf+nc,ind_new_to_Z_User);
 	 Get_SIGMA_R_VL_User(M_User,nf,nc,ind_new_to_A_User,
 			     Z0_T,VL,
 			     SIGMA_User,R_User,VL_User);
-	 print(" SIGMA_User ",M_User,SIGMA_User);
-	 print(" R_User ",M_User,R_User);
 	 /* Getting  of PL0_User and PL_User only for monitoVK */
-	 print (" Bef Get_PL0_PL_User:PL0                PL ",nf,PL0,PL);
 	 Get_PL0_PL_User(nf,ind_new_to_A_User,PL0,PL,PL0_User,PL_User);
-	 print (" Aft Get_PL0_PL_User:PL0_User                PL_User ",M_User,PL0_User,PL_User);
-	 //std::if(idebug)cout << " DMONIT, " << endl;
-	 /*
-	  */
       }
    else
       {
@@ -1961,54 +1373,13 @@ L85:
 						  VL,VL_User,
 						  Z,Z_User,
 						  PL0,PL0_User,PL,PL_User);
-
-	 print(" A_User ",M_User,A_User);
-	 print(" SIGMA_User ",M_User,SIGMA_User);
-	 print(" R_User ",M_User,R_User);
-	 print_Z(" VL_User ",M_User,VL_User);
-	 print_Z(" Z_User ",M_User,Z_User);
-	 print(" PL0_User ",M_User,PL0_User);
-	 print(" PL_User ",M_User,PL_User);
-
       }
    //Here is  Rearrange  new A,SIGMA,R,PL,PL0,Z to users, transforming from new indices to old ones
-   if(idebug)cout << " monitoVK " << endl;
-   if(idebug)cout << " bef monitoVK - ENDFLG,N,T1,GT,IMAX,IFIX,IFIX1,ALAMBD,AKAPPA " << ENDFLG << "  " << N << "  " << T1 << "  " << GT << "  " << IMAX << "  " << IFIX<< "  " << IFIX1<< "  " <<  ALAMBD << "  " << AKAPPA << endl;
-   //if(idebug)cout << fixed ;
-   if(idebug)cout << setiosflags(ios::scientific) ;
-   idebug =0 ;
-   if(idebug)
-      {
-	 monitoVK(S,M_User,NN3,IT,GT,AKAPPA,ALAMBD,
-	  A_User,SIGMA_User,R_User,PL0_User,PL_User,ENDFLG,Z_User);
-      }
-      idebug =0 ;
-
-      if(idebug)cout << " I am h " << endl;
-      for(int i = 0; i < nc;i++)
-	{ if(idebug)cout << " L85 : i, RV[i],SM.. " << i << "  "<< RV[i] << "  ";
-	  for(int j = 0; j < nf;j++)
-	    {
-	      if(idebug)cout << SM[i][j]  << "  ";
-	    }
-	  if(idebug)cout << endl;
-	}
-      if(idebug)cout << "ENDFLG,nc " << ENDFLG << "  " << nc << endl;
   if (ENDFLG == 0)
       {
 	 if(nc)
 	    {
-	       if(idebug)cout << " L85: M_User,N,nf,nc,j,ind_new_to_A_User.. " << M_User << "  "
-			      << N << "  " << nf << "  " << nc << endl;
-	       for(int j = 0; j < nf + nc + nx;j++)
-		  {
-		     if(idebug)cout << j << "  "<< ind_new_to_A_User[j] << endl;
-		  }
-	       if(idebug)cout << endl;
 	       Get_New_A_User(N,nc,RV,SM,A,DA,ind_new_to_A_User,A_User);
-	       print(" L85:  increments DA ",nf + nc,DA);
-	       print(" L85: incremented A ",nf + nc,A);
-	       print(" L85 :  incremented A_User     ",nf + nc + nx,A_User);
 	    }
 	 else
 	    {
@@ -2023,7 +1394,6 @@ L85:
       {
 	 if(nc)
 	    {
-	      if(idebug) cout << " xxx " << endl;
 	       delete ind_new_to_A_User;
 	       delete Ind_Z;
 	       delete ind_new_to_Z_User;
@@ -2039,7 +1409,6 @@ L85:
 	       delete SM;
 	       delete RV;
 	       delete ZV;
-	       if(idebug) cout  << " hhh " << endl;
 	    }
 	 return ENDFLG - 1;;
       }
