@@ -2,7 +2,10 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <TMatrixD.h>
+#include "mtrx_inv_lapack.h"
+typedef FSqMtrx FumiliMatrix;
+// #include <TMatrixD.h>
+// typedef TMatrixD FumiliMatrix;
 #include "ind.h"
 #include "mconvd.h"
 #include "Fumili.h"
@@ -301,116 +304,97 @@ void Get_dpsis(int nf,int nc,int *ind_new_to_A_User,double **dpsis_User,double *
       }
 }
 
-bool Get_RV_SM(int nf,int nc,double *psis,double **dpsis,double *RV,double **SM)
-{
-   double tolerance = 2.2204e-16;
-   double RV_Check[nc],SM_Check[nc][nf];
-   TMatrixD m(nc,nc),mp(nc,nc);
-   if(idebug)cout << " Get_RV_SM, nf,nc " << nf << "  " << nc << endl;
-   /*
-Getting QM - last nc terms in each constraint */
-   for(int i = 0;i < nc; i++)
-      {
-	 for(int j = 0;j < nc; j++)
-	    {
-	       m[i][j] = dpsis[i][nf + j] ;
-	       mp[i][j] = m[i][j];
-	       if(i == j)
-		  {
-		     if(fabs(m[i][j]) < tolerance) return 0;
-		  }
-	    }
-      }
+bool Get_RV_SM( int nf, int nc,
+                double * psis, double ** dpsis,
+                double * RV, double ** SM ) {
+  double tolerance = 2.2204e-16;
+  FumiliMatrix m(nc,nc);
+  if(idebug)
+    cout << " Get_RV_SM, nf,nc " << nf << "  " << nc << endl;
+  /* Getting QM - last nc terms in each constraint */
+  for(int i = 0; i < nc; i++) {
+    for(int j = 0;j < nc; j++) {
+      m[i][j] = dpsis[i][nf + j] ;
+//       mp[i][j] = m[i][j];
+      if(i == j && fabs(m[i][j]) < tolerance)
+        return 0;
+    }
+  }
+  FumiliMatrix mp(m);
 
-    if(idebug)cout << " Get_RV_SM : bef " << endl;
-   for(int i = 0;i < nc; i++)
-      {
-	 for(int j = 0;j < nc; j++)
-	    {
-	       if(idebug)cout << m[i][j] << "  " ;
+  if(idebug) {
+    cout << " Get_RV_SM : bef " << endl;
+    for(int i = 0; i < nc; i++) {
+      for(int j = 0; j < nc; j++)
+        cout << m[i][j] << "  " ;
+      cout << endl;
+    }
+    cout << " Get_RV_SM : Determinant " << m.Determinant() << endl;
+  }
+  m.Invert();
+  if(idebug) {
+    cout << " Get_RV_SM : aft " << endl;
+    for(int i = 0; i < nc; i++) {
+      for(int j = 0;j < nc; j++)
+        cout << m[i][j] << "  " ;
+      cout << endl;
+    }
+  }
+  if(idebug) {
+    for(int i = 0; i < nc; i++) {
+      cout << " check of inversion: i " << i << "  " ;
+      for(int j = 0; j < nc; j++) {
+        double tt = .0;
+        for(int k = 0; k < nc; k++)
+          tt += m[i][k]*mp[k][j];
+          cout << tt  <<  "  " ;
+      }
+      cout << endl;
+    }
+  }
 
-	    }
-	 if(idebug)cout << endl;
+  /* Getting RV, SM */
+  for(int i = 0; i < nc; i++) {
+    RV[i] = .0;
+    for(int j = 0; j < nc; j++)
+      RV[i] -= m[i][j]*psis[j];
+      for(int l = 0; l < nf; l++) {
+        SM[i][l] =.0;
+        for(int j = 0;j < nc; j++)
+          SM[i][l] -= m[i][j]*dpsis[j][l];
       }
-   if(idebug)cout << " Get_RV_SM : Determinant "
-		  << m.Determinant() << endl;
-   m.Invert();
-   if(idebug)cout << " Get_RV_SM : aft " << endl;
-   for(int i = 0;i < nc; i++)
-      {
-	 for(int j = 0;j < nc; j++)
-	    {
-	       if(idebug)cout << m[i][j] << "  " ;
-	    }
-	 if(idebug)cout << endl;
+    }
+  // Check of RV and SM
+  if(idebug) {
+    double RV_Check[nc], SM_Check[nc][nf];
+    cout << " RV_Check, RV: " << endl;
+    for(int i = 0; i < nc; i++) {
+      RV_Check[i] = .0;
+      for(int j = 0; j < nc; j++)
+        RV_Check[i] -= mp[i][j]*RV[j];
+      cout << "i, RV_Check[i], psis[i] - "
+           << i << "  "
+           << RV_Check[i] << "  "
+           << psis[i] << endl;
+    }
+    cout << " SM_Check, SM: " << endl;
+    for(int i = 0; i < nc; i++) {
+      for(int j = 0; j < nf; j++) {
+        SM_Check[i][j] = .0;
+        for(int k = 0; k < nc; k++)
+          SM_Check[i][j] -= mp[i][k]*SM[k][j];
+        cout << "i, j, SM_Check[i][j], dpsis[i][j] - "
+             << i << "  " << j << "  "
+             << SM_Check[i][j] << "  " << dpsis[i][j] << endl;
       }
-   for(int i = 0;i < nc;i++)
-      {
-	 if(idebug)cout << " check of inversion: i " << i << "  " ;
-	 for(int j = 0;j < nc;j++)
-	    {
-	       double tt = .0;
-	       for(int k = 0 ;k < nc ;k++)
-		  {
-		     tt += m[i][k]*mp[k][j];
-		  }
-	       if(idebug)cout << tt  <<  "  " ;
-	    }
-	 if(idebug)cout << endl;
-      }
-
-   /* Getting RV,SM */
-   for(int i = 0;i < nc; i++)
-      {
-	 RV[i] = .0;
-	 for(int j = 0;j < nc; j++)
-	    {
-	       RV[i] -= m[i][j]*psis[j];
-	    }
-	 for(int l = 0;l < nf; l++)
-	    {
-	       SM[i][l] =.0;
-	       for(int j = 0;j < nc; j++)
-		  {
-		     SM[i][l] -= m[i][j]*dpsis[j][l];
-		  }
-	    }
-      }
-   // Check of RV and SM
-   if(idebug)
-      {
-	 cout << " RV_Check, RV: " << endl;
-	 for(int i = 0;i < nc; i++)
-	    {
-	       RV_Check[i] = .0;
-	       for(int j = 0;j < nc; j++)
-		  {
-		     RV_Check[i] -= mp[i][j]*RV[j];
-		  }
-	       cout << "i,RV_Check[i],psis[i] - " << i << "  " << RV_Check[i] << "  " << psis[i] << endl;
-	    }
-	 cout << " SM_Check, SM: " << endl;
-	 for(int i = 0;i < nc; i++)
-	    {
-	       for(int j = 0;j < nf; j++)
-		  {
-		     SM_Check[i][j] = .0;
-		     for(int k = 0;k < nc; k++)
-			{
-			   SM_Check[i][j] -= mp[i][k]*SM[k][j];
-			}
-		     cout << "i,j,SM_Check[i][j],dpsis[i][j] - " << i << "  " << j << "  "
-			  << SM_Check[i][j] << "  " << dpsis[i][j] << endl;
-		  }
-	    }
-      }
-   return 1;
+    }
+  }
+  return 1;
 }
-void   Get_New_Quadratic_Form(int nf,int nc,
-			     double *RV,
-			     double **SM,double &S ,
-			      double G[],double Z[])
-{
+void Get_New_Quadratic_Form(int nf, int nc,
+                            double * RV,
+                            double ** SM, double & S,
+                            double G[], double Z[]) {
    /*
      nf, nc - number of free parameters and constraints
      psis,dpsi - vector of constraint values and matrix of constraint derivatives  over all parameters
@@ -933,20 +917,13 @@ int Get_Qty_Of_Different_Non_Zero_Derivatives(int nc,int *Qty_nc,int **Numbers,
       }
    return Qty;
 }
-void GetDeterminant(double **dpsis_User,int nc,int *SelectedIndices,double &DeterminantValue)
-{
-  TMatrixD m(nc,nc);
-  //if(idebug) cout << " GetDeterminant,matrix: " << endl;
-  for(int i = 0; i < nc;i++)
-    {
-      for(int j = 0; j < nc;j++)
-	{
-	  m[i][j] = dpsis_User[i][SelectedIndices[j]];
-	  //if(idebug) cout << m[i][j] << "  ";
-	}
-      //if(idebug) cout << endl;;
-    }
-  DeterminantValue =   m.Determinant();
+void GetDeterminant(double ** dpsis_User, int nc,
+                    int * SelectedIndices, double & DeterminantValue) {
+  FumiliMatrix m(nc, nc);
+  for(int i = 0; i < nc; i++)
+    for(int j = 0; j < nc; j++)
+      m[i][j] = dpsis_User[i][SelectedIndices[j]];
+  DeterminantValue = m.Determinant();
 }
 void SelectFigures(int Qty_Selected,int **SelectedIndices,double *DeterminantValues,int nc,
 		       int *Figures)
@@ -1650,169 +1627,117 @@ L3:
    T1 = 1.;
 
 L4:
-
-   S = 0.;
-   N0 = 0;
-   for (I = 0; I < N; I++)
-      {
-	 G[I] = 0.;
-	 if (PL0[I] > .0)
-	    {
-	       N0 = N0 + 1;
-	       if (PL[I] > .0) PL0[I] = PL[I];
-	    }
+  S = 0.;
+  N0 = 0;
+  for (I = 0; I < N; I++) {
+    G[I] = 0.;
+    if (PL0[I] > .0) {
+      N0 = N0 + 1;
+      if (PL[I] > .0) PL0[I] = PL[I];
+    }
+  }
+  int NN0;
+  NN0 = N0 * (N0 + 1) / 2;
+  if (NN0 >= 1)
+    {
+        for (I = 0; I < NN0; I++) Z[I] = 0.;
+    }
+  //INDFLG[0] = 0;
+  INDFLG[0] = -1;// My change : 05.05.14
+  int ijkl;
+  if(idebug)cout << " Bef SGZ:NN3,Number of Free parameters " << NN3 << "  " << M << endl;
+  if(nc) {
+    ijkl = SGZ(M_User, S_User, A_User, PL0_User, G_User, Z_User);
+    //cout << "ijkl " << ijkl << endl;
+    if(!ijkl)return -1;
+    S = S_User;
+    if(idebug) cout << " S,G_User,Z_User: " << endl;
+    if(idebug) cout << " S_User, Bef Rearrange_S_G_Z = " << S_User << endl;
+    print_Single("  G_User, Bef Rearrange_S_G_Z ", M_User, G_User);
+    print_Z(" Z_User, Bef Rearrange_S_G_Z ", M_User-nx, Z_User);
+    get_psis_and_derivatives(nf + nc + nx, A_User, psis, dpsis_User);
+    //cout << " psis " << psis[0] << endl;
+    if(idebug) {
+      // Errors - error  for fixed parameters are zeroes, for others - from matrix
+      FumiliMatrix Z0_Temp(nf+nc, nf+nc);
+      double Errors[M_User];
+      cout << "Z0_Temp : " << endl;
+      for(int i = 0; i < nf+nc; i++) {
+        cout << " i = " << i << "  ";
+        for(int j = 0; j <= i; j++) {
+          Z0_Temp[i][j] = Z_User[ind(ind_new_to_Z_User[i],ind_new_to_Z_User[j])];
+          cout << Z0_Temp[i][j] << "  ";
+        }
+        cout << endl;
       }
-   int NN0;
-   NN0 = N0 * (N0 + 1) / 2;
-   if (NN0 >= 1)
-      {
-	 for (I = 0; I < NN0; I++) Z[I] = 0.;
+      Z0_Temp.Invert();
+      cout << " Experimental Errors : " << endl;
+      for(int i = 0; i < nf+nc; i++)
+        Errors[ind_new_to_A_User[i]] = sqrt(Z0_Temp[i][i]);
+      for(int i = nf+nc; i < M_User; i++)
+        Errors[ind_new_to_A_User[i]] = .0;
+      for(int i = 0; i < M_User;i++)
+        cout << "i, Error " << i << "  " << Errors[i] << endl;
+      double * psis_T = new double[nc];
+      double ** dpsis_T = new double*[nc];
+      for(int i = 0; i < nc;i++)
+        dpsis_T[i] = new double[M_User]; // M is not yet changed!!
+      cout << " Check of derivatives : " << endl;
+      double Der[nc][M_User], A_Temp[M_User];
+      for(int i = 0; i < M_User; i++) {
+        for(int l = 0; l < M_User;l++)
+          A_Temp[l] = A_User[l];
+        if(Errors[i] != .0)
+          A_Temp[i] = A_Temp[i] + 0.00001*Errors[i];
+        else
+          A_Temp[i] = A_Temp[i];
+        get_psis_and_derivatives(nf + nc + nx,A_Temp,psis_T,dpsis_T);
+        for(int k = 0; k < nc; k++) {
+          if(Errors[i] != .0)
+            Der[k][i] = (psis_T[k] -psis[k])/( 0.00001*Errors[i]);
+          else
+            Der[k][i] = .0;
+        }
       }
-   //INDFLG[0] = 0;
-   INDFLG[0] = -1;// My change : 05.05.14
-   int ijkl;
-   if(idebug)cout << " Bef SGZ:NN3,Number of Free parameters " << NN3 << "  " << M << endl;
-   if(nc)
-      {
-	 ijkl = SGZ(M_User, S_User, A_User, PL0_User, G_User, Z_User);
-	 //cout << "ijkl " << ijkl << endl;
-	 if(!ijkl)return -1;
-	 S = S_User;
-	 if(idebug)cout << " S,G_User,Z_User: " << endl;
-	 if(idebug)cout << " S_User, Bef Rearrange_S_G_Z = " << S_User << endl;
-	 print_Single("  G_User, Bef Rearrange_S_G_Z ",M_User,G_User);
-	 print_Z(" Z_User, Bef Rearrange_S_G_Z ",M_User - nx,Z_User);
-	 get_psis_and_derivatives(nf + nc + nx,A_User,psis,dpsis_User);
-	 //cout << " psis " << psis[0] << endl;
-	 if(idebug)
-	    {
-	       // Errors - error  for fixed parameters are zeroes, for others - from matrix
-	       TMatrixD Z0_Temp(nf+nc,nf+nc);
-	       double Errors[M_User];
-	       cout << "Z0_Temp : " << endl;
-	       for(int i = 0; i < nf + nc;i++)
-		  {
-		     cout << " i = " << i << "  ";
-		     for(int j = 0; j <= i;j++)
-			{
-			   Z0_Temp[i][j] = Z_User[ind(ind_new_to_Z_User[i],ind_new_to_Z_User[j])];
-			   cout << Z0_Temp[i][j] << "  ";
-			}
-		     cout << endl;
-		  }
-	       Z0_Temp.Invert();
-	       cout << " Experimental Errors : " << endl;
-	       for(int i = 0; i < nf + nc;i++)
-		  {
-		     Errors[ind_new_to_A_User[i]] = sqrt(Z0_Temp[i][i]);
-		  }
-	       for(int i = nf + nc; i < M_User;i++)
-		  {
-		     Errors[ind_new_to_A_User[i]] = .0;
-		  }
-
-	       for(int i = 0; i < M_User;i++)
-		  {
-		     cout << "i, Error " << i << "  "
-			  << Errors[i] << endl;
-		  }
-	       double *psis_T = new  double[nc];
-	       double **dpsis_T = new double*[nc];
-	       for(int i = 0; i < nc;i++)
-		  {
-		     dpsis_T[i] = new double[M_User]; // M is not yet changed!!
-		  }
-
-	       cout << " Check of derivatives : " << endl;
-	       double Der[nc][M_User],A_Temp[M_User];
-
-	       for(int i = 0; i < M_User;i++)
-		  {
-		     for(int l = 0; l < M_User;l++)
-			{
-			   A_Temp[l] = A_User[l];
-			}
-
-		     if(Errors[i] != .0)
-			{
-			   A_Temp[i] = A_Temp[i] +  0.00001*Errors[i];
-			}
-		     else A_Temp[i] = A_Temp[i];
-		     get_psis_and_derivatives(nf + nc + nx,A_Temp,psis_T,dpsis_T);
-
-		     for(int k = 0; k < nc;k++)
-			{
-			   if(Errors[i] != .0)
-			      {
-				 Der[k][i] = (psis_T[k] -psis[k])/( 0.00001*Errors[i]);
-			      }
-			   else Der[k][i] = .0;
-			}
-		  }
-	       for(int k = 0; k < nc;k++)
-		  {
-		     for(int i = 0; i < M_User;i++)
-			{
-			   if(Errors[i] != .0)
-			      {
-				 cout << "nc,i,Der, dpsis " << k << "  " << i << "  " <<
-				    Der[k][i] << "  " << dpsis_User[k][i] << "  " <<
-				    fabs(Der[k][i] - dpsis_User[k][i])/Errors[i]  <<endl;
-			      }
-			   else
-			     {
-			       cout << "nc,i " <<  k << "  " << i << " This parameter fixed " << endl;
-			     }
-			}
-		     cout << "********************************" << endl;
-		  }
-
-	       for(int i = 0; i < nc;i++)
-		  {
-		     delete dpsis_T[i]; // M is not yet changed!!
-		  }
-	       delete dpsis_T;
-	       delete psis_T;// Inserted by VK(30.05.16)
-
-	    }
-	 if(Rearrange_S_G_Z(A_User,
-			    nf,nc,nx, ind_new_to_A_User,ind_new_to_Z_User,
-			    psis,dpsis_User,dpsis,
-			    RV,SM,
-			    S,
-			    G_User, G,
-			    Z_User, Z))
-	    {
-	       /* Saving terms for calculation of R for Substituted_Parameters */
-	       if(idebug)cout << " S_User, Aft Rearrange_S_G_Z = " << S_User << endl;
-	       print_Single("  G_User, Aft Rearrange_S_G_Z ",M_User,G_User);
-	       print_Z(" Z_User, Aft Rearrange_S_G_Z ",M_User,Z_User);
-	       if(idebug)cout << " S, Aft Rearrange_S_G_Z = " << S << endl;
-	       print_Single("  G, Aft Rearrange_S_G_Z ",M,G);
-	       print_Z(" Z, Aft Rearrange_S_G_Z ",M,Z);
-	       for(int k = 0; k <  nc; k++)// index of row
-		  {
-		     ZV[k] = Z[ind(nf+ k,nf + k)];
-		  }
-	    }
-	    else return 11;
+      for(int k = 0; k < nc; k++) {
+        for(int i = 0; i < M_User; i++) {
+          if(Errors[i] != .0) {
+            cout << "nc, i, Der, dpsis " << k << "  " << i << "  "
+                 << Der[k][i] << "  " << dpsis_User[k][i] << "  "
+                 << fabs(Der[k][i]-dpsis_User[k][i])/Errors[i] << endl;
+          } else {
+            cout << "nc,i " <<  k << "  " << i << " This parameter fixed " << endl;
+          }
+        }
+        cout << "********************************" << endl;
       }
-   else
-      {
- 	 print_Single("  A, Bef SGZ without constraints ",M,A);
-	 ijkl = SGZ(M_User, S, A, PL0, G, Z);
-	 /*
-	 for(int i = 0; i < 4; i++)
-	    {
-	       if(idebug)cout << " i,psis[i],after = " << i  << "  " << psis[i] << "  " ;
-	       if(idebug)cout << endl;
-	    }
-	 */
-	 print_Single("  A, Aft SGZ without constraints ",M,A);
-	 print_Single("  G, Aft SGZ without constraints ",M,G);
-	 print_Z(" Z, Aft SGZ without constraints ",N0,Z);
-	 S_User = S;// Change 16.09.14
-     }
+      for(int i = 0; i < nc;i++)
+        delete [] dpsis_T[i]; // M is not yet changed!!
+      delete [] dpsis_T;
+      delete [] psis_T;// Inserted by VK(30.05.16)
+    }
+    if( Rearrange_S_G_Z(A_User, nf, nc, nx, ind_new_to_A_User, ind_new_to_Z_User,
+                        psis, dpsis_User, dpsis, RV, SM, S, G_User, G, Z_User, Z) ) {
+      /* Saving terms for calculation of R for Substituted_Parameters */
+      if(idebug) cout << " S_User, Aft Rearrange_S_G_Z = " << S_User << endl;
+      print_Single("  G_User, Aft Rearrange_S_G_Z ", M_User, G_User);
+      print_Z(" Z_User, Aft Rearrange_S_G_Z ", M_User, Z_User);
+      if(idebug) cout << " S, Aft Rearrange_S_G_Z = " << S << endl;
+      print_Single("  G, Aft Rearrange_S_G_Z ", M, G);
+      print_Z(" Z, Aft Rearrange_S_G_Z ", M, Z);
+      for(int k = 0; k <  nc; k++) // index of row
+        ZV[k] = Z[ind(nf+ k,nf + k)];
+    } else {
+      return 11;
+    }
+  } else {
+    print_Single("  A, Bef SGZ without constraints ",M,A);
+    ijkl = SGZ(M_User, S, A, PL0, G, Z);
+    print_Single("  A, Aft SGZ without constraints ",M,A);
+    print_Single("  G, Aft SGZ without constraints ",M,G);
+    print_Z(" Z, Aft SGZ without constraints ",N0,Z);
+    S_User = S; // Change 16.09.14
+  }
 
    /* Here we should have correct A_User! */
    if (!ijkl) return 10;

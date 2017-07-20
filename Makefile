@@ -10,7 +10,7 @@ LDFLAGS := -O2 -g
 LDFLAGS += $(shell root-config --libs) -lMinuit -lGeom
 
 TARG := test
-OBJS := Fumili mconvd
+OBJS := Fumili mconvd mtrx_inv_$(LALIB)
 
 run: $(TARG)
 	@./$<
@@ -24,7 +24,7 @@ test_inv: $(addsuffix .o,test_inv mtrx_inv_$(LALIB) test_mat)
 %: %.o
 %: %.o $(addsuffix .o,$(OBJS))
 	@echo 'Linking executable $@'
-	@$(CXX) $^ $(LDFLAGS) -o $@
+	@$(CXX) $^ $(LDFLAGS) -l$(LALIB) -o $@
 
 %.o: %.cc
 %.o: %.cc %.d

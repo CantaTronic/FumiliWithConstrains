@@ -11,10 +11,12 @@ extern "C" {
 }
 
 FSqMtrx::FSqMtrx(int n1, int n2): N(n1), M(new double[N*N]) {
-  fprintf(stderr, "Warning:\n");
-  fprintf(stderr, "  trying to make square matrix of size %i*%i\n", n1, n2);
-  fprintf(stderr, "  creating matrix %i*%i instead\n", n1, n1);
-  fflush(stderr);
+  if(n1 != n2) {
+    fprintf(stderr, "Warning:\n");
+    fprintf(stderr, "  trying to make square matrix of size %i*%i\n", n1, n2);
+    fprintf(stderr, "  creating matrix %i*%i instead\n", n1, n1);
+    fflush(stderr);
+  }
 }
 
 FSqMtrx::FSqMtrx(int n, double * m): N(n), M(new double[N*N]) {
