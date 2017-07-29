@@ -1,7 +1,7 @@
 
-LALIB := LAPACK
+# LALIB := LAPACK
 # LALIB := OPENBLAS
-# LALIB := ROOT
+LALIB := ROOT
 
 CXXFLAGS := -O2 -g -Wall -fPIC -Wno-maybe-uninitialized
 ifeq ($(LALIB),ROOT)
@@ -26,6 +26,11 @@ run: $(TARG)
 	@./$<
 
 test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+	@./$@
+
+unif: $(addsuffix .o, test_unif unif)
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
