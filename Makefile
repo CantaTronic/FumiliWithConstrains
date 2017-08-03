@@ -40,6 +40,11 @@ test_root_fumili: test_root_fumili.o
 	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
 
+unif: $(addsuffix .o, test_unif unif)
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+	@./$@
+
 %: %.cc
 %: %.o
 %: %.o $(addsuffix .o,$(OBJS))
