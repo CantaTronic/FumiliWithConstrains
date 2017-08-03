@@ -16,7 +16,7 @@ ifeq ($(LALIB),OPENBLAS)
   LDFLAGS += -lopenblas
 endif
 ifeq ($(LALIB),ROOT)
-  LDFLAGS += $(shell root-config --libs)
+  LDFLAGS += $(shell root-config --libs) -lFumili
 endif
 
 TARG := test
@@ -31,6 +31,11 @@ test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
 	@./$@
 
 test_minuit: test_minuit.o
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+	@./$@
+
+test_root_fumili: test_root_fumili.o
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
