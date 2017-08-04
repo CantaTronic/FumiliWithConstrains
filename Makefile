@@ -34,7 +34,7 @@ test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
 	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
 
-unif: $(addsuffix .o, test_unif unif)
+unif: $(addsuffix .o, test_unif PDFGen PDFGenSquare MyPDF)
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 # 	@./$@

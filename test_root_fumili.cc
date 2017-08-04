@@ -18,6 +18,7 @@ namespace FCN {
 }
 
 int main(int arc, char ** argv) {
+  // check MC normalization
   double mc[FCN::nev*5][2];
   std::ifstream ifs("mc_.dat");
   for(int i = 0; i < FCN::nev*5; i++)
@@ -32,7 +33,7 @@ int main(int arc, char ** argv) {
   std::cout<<"Norm MC: "<<norm<<", ";
   norm = FCN::Norm(p);
   std::cout<<"Norm analytical: "<<norm<<std::endl;
-
+  // start analysis
   FCN::ReadData("unif_.dat");
   // initialize fitter
   FCN::fumili = new TFumili;
