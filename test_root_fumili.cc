@@ -13,8 +13,8 @@ namespace FCN {
   void Print(const char * name, int n, double * d);
   double PDF(double * x, double * p);
   double Norm(double * p);
-  double dPDFdx(int np, double * x);
-  double dNormdx(int np);
+  double dPDFdx(int np, double * x, double * p = 0, double pdf = 0);
+  double dNormdx(int np, double * p = 0, double norm = 0);
 }
 
 int main(int arc, char ** argv) {
@@ -47,13 +47,12 @@ void FCN::FCN(int & n_par, double * gradients, double & ret_val, double * par, i
   n_par = fumili->GetNumberTotalParameters();
   double * Z = fumili->GetZ();
   double * PL0 = fumili->GetPL0();
-  std::cout<<"N: "<<n_par<<std::endl;
-  Print("P", n_par, par);
-  Print("PL0", n_par, PL0);
-//   exit(0);
+//   std::cout<<"N: "<<n_par<<std::endl;
+//   Print("P", n_par, par);
+//   Print("PL0", n_par, PL0);
+  // fill SGZ with zeros
   ret_val = 0.;
-  int iz = 0;
-  for(int i = 0; i < n_par; i++) {
+  for(int i = 0, iz = 0; i < n_par; i++) {
     gradients[i] = .0;
     if(PL0[i] <= .0) continue;
     for(int j = 0; j <= i; j++) {
@@ -62,32 +61,46 @@ void FCN::FCN(int & n_par, double * gradients, double & ret_val, double * par, i
       iz++;
     }
   }
+  // calculate SGZ
   for (int iev = 0; iev < nev; iev++) {
-//     double pdf_unnormalized = 1. + par[0]*data[iev][0] + par[1]*data[iev][1];
-//     double normalization   = 1. + 0.5*par[0] + 0.5*par[1];
     double pdf = PDF(data[iev], par);
-    double norm = Norm(par);
-    ret_val += -log(pdf/norm);
+    ret_val += -log(pdf);
     // Derivatives
-    double df[n_par];
-    for(int i = 0; i < n_par; i++) {
-      df[i] = -dPDFdx(i, data[iev])/pdf + dNormdx(i)/norm;
-    }
-    int iz = 0;
-    for(int i = 0; i < n_par; i++) {
+    double dpdf[n_par];
+    for(int i = 0, iz = 0; i < n_par; i++) {
       if(PL0[i] <= .0) continue;
       // Calculation of gradient
-      gradients[i] += df[i];
+      dpdf[i] = -dPDFdx(i, data[iev], par, pdf)/pdf;
+      gradients[i] += dpdf[i];
       for(int j = 0; j <= i; j++) {
         if(PL0[j] <= .0) continue;
-        Z[iz] += df[i]*df[j];
+        Z[iz] += dpdf[i]*dpdf[j];
         iz++;
       }
     }
   }
-  Print("S", 1, &ret_val);
+  // add normalization
+  double norm = Norm(par);
+  double dnorm[n_par];
+  for(int i = 0; i < n_par; i++) {
+    dnorm[i] = dNormdx(i, par, norm)/norm;
+  }
+  ret_val += nev*log(norm);
+  for(int i = 0, iz = 0; i < n_par; i++) {
+    if(PL0[i] <= .0) continue;
+    for(int j = 0; j <= i; j++) {
+      if(PL0[j] <= .0) continue;
+      Z[iz] += dnorm[i]*gradients[j] + gradients[i]*dnorm[j] + nev*dnorm[i]*dnorm[j];
+      iz++;
+    }
+  }
+  for(int i = 0; i < n_par; i++) {
+    if(PL0[i] <= .0) continue;
+    gradients[i] += nev*dnorm[i];
+  }
+//   Print("S", 1, &ret_val);
   Print("G", n_par, gradients);
-  Print("Z", (n_par+1)*n_par/2, Z);
+  Print("Z", (fumili->GetNumberFreeParameters()+1)*fumili->GetNumberFreeParameters()/2, Z);
 }
 // read data from file
 void FCN::ReadData(const char * filename) {
@@ -108,13 +121,25 @@ double FCN::PDF(double * x, double * p) {
 double FCN::Norm(double * p) {
   return 1 + p[0]/2. + p[1]/3. + p[2]/2. + p[3]/3.;
 }
-double FCN::dPDFdx(int np, double * x) {
-  double p[4] = {0.};
-  p[np] = 1;
-  return p[0]*x[0] + p[1]*x[0]*x[0] + p[2]*x[1] + p[3]*x[1]*x[1];
+double FCN::dPDFdx(int np, double * x, double * p, double pdf) {
+  double _p[4] = {0.};
+  if(p) { // numeric calculation
+    memcpy(_p, p, 4*sizeof(double));
+    _p[np] += 1e-3;
+    double _pdf = PDF(x, _p);
+    return (_pdf-pdf)*1e3;
+  }
+  _p[np] = 1;
+  return _p[0]*x[0] + _p[1]*x[0]*x[0] + _p[2]*x[1] + _p[3]*x[1]*x[1];
 }
-double FCN::dNormdx(int np) {
-  double p[4] = {0.};
-  p[np] = 1;
-  return p[0]/2. + p[1]/3. + p[2]/2. + p[3]/3.;
+double FCN::dNormdx(int np, double * p, double norm) {
+  double _p[4] = {0.};
+  if(p) { // numeric calculation
+    memcpy(_p, p, 4*sizeof(double));
+    _p[np] += 1e-3;
+    double _norm = Norm(_p);
+    return (_norm-norm)*1e3;
+  }
+  _p[np] = 1;
+  return _p[0]/2. + _p[1]/3. + _p[2]/2. + _p[3]/3.;
 }
