@@ -10,12 +10,13 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 
-PDFGen::PDFGen(const char * ofs_name)
+PDFGen::PDFGen(const char * ofs_name, const char * mc_name)
     : pdf(PDFGen::pdf_default),
       x_min(0), x_max(1), y_min(0), y_max(1), pdf_max(0),
       rootfile(0), hist_xy(0), hist_x(0), hist_y(0) {
   gRandom->SetSeed(0);
   ofs.open(ofs_name);
+  if(mc_name) mc.open(mc_name);
 }
 void PDFGen::SetLimits(float _x_min, float _x_max, float _y_min, float _y_max) {
   x_min = _x_min;
@@ -41,7 +42,7 @@ void PDFGen::Generate(unsigned N) {
     float x = gRandom->Uniform(x_min, x_max);
     float y = gRandom->Uniform(x_min, x_max);
     float z = gRandom->Uniform(0, pdf_max);
-    if (pdf(x, y) > z) {
+    if (z < pdf(x, y)) {
       ofs<<std::setw(15)<<x<<std::setw(15)<<y<<std::endl;
       if (rootfile) {
         hist_x->Fill(x);
@@ -49,6 +50,13 @@ void PDFGen::Generate(unsigned N) {
         hist_xy->Fill(x,y);
       }
       i++;
+    }
+  }
+  if(mc.is_open()) {
+    for(unsigned i = 0; i < N*10; i++) {
+      float x = gRandom->Uniform(x_min, x_max);
+      float y = gRandom->Uniform(x_min, x_max);
+      mc<<std::setw(15)<<x<<std::setw(15)<<y<<std::endl;
     }
   }
 }
@@ -73,6 +81,7 @@ PDFGen::~PDFGen() {
     rootfile->Close();
   }
   ofs.close();
+  if(mc.is_open()) mc.close();
 }
 float PDFGen::pdf_default(float x, float y) {
   return 1;

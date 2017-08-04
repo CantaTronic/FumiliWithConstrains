@@ -25,17 +25,11 @@ OBJS := Fumili mconvd mtrx_inv
 run: $(TARG)
 	@./$<
 
+$(TARG): $(TARG).o $(addsuffix .o,$(OBJS))
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+
 test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
-	@echo 'Linking executable $@'
-	@$(CXX) $^ $(LDFLAGS) -o $@
-	@./$@
-
-test_minuit: test_minuit.o
-	@echo 'Linking executable $@'
-	@$(CXX) $^ $(LDFLAGS) -o $@
-	@./$@
-
-test_root_fumili: test_root_fumili.o
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
@@ -43,11 +37,11 @@ test_root_fumili: test_root_fumili.o
 unif: $(addsuffix .o, test_unif unif)
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
-	@./$@
+# 	@./$@
 
 %: %.cc
 %: %.o
-%: %.o $(addsuffix .o,$(OBJS))
+%: %.o
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 

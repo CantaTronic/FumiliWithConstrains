@@ -12,6 +12,7 @@ class TF2;
 class PDFGen {
 private:
   std::ofstream ofs;
+  std::ofstream mc;
   float (*pdf)(float x, float y);
   float x_min, x_max, y_min, y_max;
   float pdf_max;
@@ -21,7 +22,7 @@ private:
   TH1F * hist_y;
   static float pdf_default(float x, float y);
 public:
-  PDFGen(const char * ofs_name);
+  PDFGen(const char * ofs_name, const char * mc_name = 0);
   void SetLimits(float _x_min, float _x_max, float _y_min, float _y_max);
   void SetPDF(float (*_pdf)(float x, float y), float _pdf_max);
   void InitROOT(const char * rootfile_name);

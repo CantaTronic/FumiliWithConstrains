@@ -18,6 +18,21 @@ namespace FCN {
 }
 
 int main(int arc, char ** argv) {
+  double mc[FCN::nev*5][2];
+  std::ifstream ifs("mc_.dat");
+  for(int i = 0; i < FCN::nev*5; i++)
+    ifs >> mc[i][0] >> mc[i][1];
+  ifs.close();
+  double p[] = {0.5, 0.3, 0.8, 0.1};
+  double norm = 0;
+  for(int iev = 0; iev < FCN::nev*5; iev++) {
+    norm += FCN::PDF(mc[iev], p);
+  }
+  norm /= FCN::nev*5;
+  std::cout<<"Norm MC: "<<norm<<", ";
+  norm = FCN::Norm(p);
+  std::cout<<"Norm analytical: "<<norm<<std::endl;
+
   FCN::ReadData("unif_.dat");
   // initialize fitter
   FCN::fumili = new TFumili;
@@ -99,8 +114,8 @@ void FCN::FCN(int & n_par, double * gradients, double & ret_val, double * par, i
     gradients[i] += nev*dnorm[i];
   }
 //   Print("S", 1, &ret_val);
-  Print("G", n_par, gradients);
-  Print("Z", (fumili->GetNumberFreeParameters()+1)*fumili->GetNumberFreeParameters()/2, Z);
+//   Print("G", n_par, gradients);
+//   Print("Z", (fumili->GetNumberFreeParameters()+1)*fumili->GetNumberFreeParameters()/2, Z);
 }
 // read data from file
 void FCN::ReadData(const char * filename) {
