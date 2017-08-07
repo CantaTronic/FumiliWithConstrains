@@ -1,0 +1,51 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+%opening
+\title{Mathematics under a Fulimi maximum likelihood realization}
+% \author{Tokareva~V.~A.}
+
+\begin{document}
+
+\maketitle
+
+% \begin{abstract}
+%
+% \end{abstract}
+
+% \section{}
+
+Let's name probability dencity function as \textit{pdf}. And normalized \textit{pdf} as \textit{norm}.
+
+Let \textit{n} be an events number and \textit{i} be a current event number.
+
+To do: What are \textit{p} and \textit{k}?
+
+Then
+$$f = - \sum_{i=1}^{n}\ln \left(\frac{pdf_i}{norm} \right) = - \sum_{i=1}^{n} \left[\ln(pdf_i) - \ln(norm) \right] =\\
+- \underbrace{\sum_{i=1}^{n} \ln(pdf_i)}_{83} + \underbrace{n*\ln(norm)}_{104} $$
+
+See lines 83 and 104 of class code.
+
+$$\frac{\partial \ln \left( \frac{pdf_i}{norm}\right)}{\partial p_k}  = \frac{norm}{pdf_i}* \left(\frac{\frac{\partial pdf}{\partial p_k}*norm - \frac{\partial norm}{\partial p_k}*pdf_i}{norm^2} \right) = \frac{\frac{\partial pdf_i}{\partial p_k}*norm - \frac{\partial norm}{\partial p_k}*pdf_i}{pdf_i*norm} = \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i} - \frac{\frac{\partial norm}{\partial p_k}}{norm}$$
+
+$$\frac{\partial f}{\partial p_k} = \frac{\partial \left( - \sum_{i=1}^n \ln \frac{pdf_i}{norm} \right)}{\partial p_k} = -\sum_{i=1}^n \frac{\partial \ln \left( \frac{pdf_i}{norm} \right)}{\partial p_k} = - \sum_{i=1}^n \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i} + \sum_{i=1}^n \frac{\frac{\partial norm}{\partial p_k}}{norm} = \\
+- \underbrace{\sum_{i=1}^n \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i}}_{90} + \underbrace{n* \frac{\frac{\partial norm}{\partial p_k}}{norm}}_{115} $$
+
+See lines 90 and 115 of class code.
+
+Discuss $z_{kl}$ which is ...(what?), there \textit{l} is ...
+
+$$z_{kl} = \sum_{i=1}^n \frac{\partial \ln \left( \frac{pdf_i}{norm} \right)}{\partial p_k} * \frac{\partial \ln \left( \frac{pdf_i}{norm}\right)}{\partial p_l} = \\
+\sum_{i=1}^n \left( \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i} - \frac{\frac{\partial norm}{\partial p_k}}{norm}\right) \left( \frac{\frac{\partial pdf_i}{\partial p_l}}{pdf_i} - \frac{\frac{\partial norm}{\partial p_l}}{norm}\right) = $$
+$$\sum_{i=1}^n \left[\frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i} \frac{\frac{\partial pdf_i}{\partial p_l}}{pdf_i} - \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i} \frac{\frac{\partial norm}{\partial p_l}}{norm}   -  \frac{\frac{\partial pdf_i}{\partial p_l}}{pdf_i} \frac{\frac{\partial norm}{\partial p_k}}{norm} +  \frac{\frac{\partial norm}{\partial p_k}}{norm} \frac{\frac{\partial norm}{\partial p_l}}{norm} \right] = $$
+
+$$ = \underbrace{\sum_{i=1}^n \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i} \frac{\frac{\partial pdf_i}{\partial p_l}}{pdf_i}}_{93} \\
+- \underbrace{\frac{\frac{\partial norm}{\partial p_l}}{norm}  \underbrace{\sum_{i=1}^n \frac{\frac{\partial pdf_i}{\partial p_k}}{pdf_i}}_{\substack{unnormalized\\derivative}}}_{109} \\
+- \underbrace{\frac{\frac{\partial norm}{\partial p_k}}{norm}  \underbrace{\sum_{i=1}^n \frac{\frac{\partial pdf_i}{\partial p_l}}{pdf_i}}_{\substack{unnormalized\\derivative}}}_{109} \\
++ \underbrace{\frac{\frac{\partial norm}{\partial p_k}}{norm} \frac{\frac{\partial norm}{\partial p_l}}{norm}*n}_{109} $$
+
+See lines 93 and 109 of class code.
+
+\end{document}
