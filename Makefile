@@ -1,7 +1,7 @@
 
-LALIB := LAPACK
+# LALIB := LAPACK
 # LALIB := OPENBLAS
-# LALIB := ROOT
+LALIB := ROOT
 
 CXXFLAGS := -O2 -g -Wall -fPIC -Wno-maybe-uninitialized
 ifeq ($(LALIB),ROOT)
@@ -16,7 +16,7 @@ ifeq ($(LALIB),OPENBLAS)
   LDFLAGS += -lopenblas
 endif
 ifeq ($(LALIB),ROOT)
-  LDFLAGS += $(shell root-config --libs)
+  LDFLAGS += $(shell root-config --libs) -lFumili
 endif
 
 TARG := test
@@ -26,6 +26,21 @@ run: $(TARG)
 	@./$<
 
 test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+	@./$@
+
+test_minuit: test_minuit.o
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+	@./$@
+
+test_root_fumili: test_root_fumili.o
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+	@./$@
+
+unif: $(addsuffix .o, test_unif unif)
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 	@./$@
