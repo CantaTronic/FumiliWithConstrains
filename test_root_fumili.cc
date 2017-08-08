@@ -61,6 +61,7 @@ int main(int arc, char ** argv) {
 // objective function
 void FCN::FCN(int & n_par, double * gradients, double & ret_val, double * par, int flag) {
   n_par = fumili->GetNumberTotalParameters();
+  int n_free_par = fumili->GetNumberFreeParameters();
   double * Z = fumili->GetZ();
   double * PL0 = fumili->GetPL0();
 //   std::cout<<"N: "<<n_par<<std::endl;
@@ -68,15 +69,8 @@ void FCN::FCN(int & n_par, double * gradients, double & ret_val, double * par, i
 //   Print("PL0", n_par, PL0);
   // fill SGZ with zeros
   ret_val = 0.;
-  for(int i = 0, iz = 0; i < n_par; i++) {
-    gradients[i] = .0;
-    if(PL0[i] <= .0) continue;
-    for(int j = 0; j <= i; j++) {
-      if(PL0[j] <= .0) continue;
-      Z[iz] = .0;
-      iz++;
-    }
-  }
+  memset(gradients, 0, sizeof(double)*n_par);
+  memset(Z, 0, sizeof(double)*n_free_par*(n_free_par+1)/2);
   // calculate SGZ
   for (int iev = 0; iev < nev; iev++) {
     double pdf = PDF(data[iev], par);
@@ -116,7 +110,7 @@ void FCN::FCN(int & n_par, double * gradients, double & ret_val, double * par, i
   }
 //   Print("S", 1, &ret_val);
 //   Print("G", n_par, gradients);
-//   Print("Z", (fumili->GetNumberFreeParameters()+1)*fumili->GetNumberFreeParameters()/2, Z);
+//   Print("Z", (n_free_par+1)*n_free_par/2, Z);
 }
 // read data from file
 void FCN::ReadData(const char * filename) {
