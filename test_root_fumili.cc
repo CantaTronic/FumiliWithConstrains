@@ -1,4 +1,5 @@
 
+#include "MyPDF.h"
 #include <TFumili.h>
 #include <fstream>
 #include <iostream>
@@ -7,8 +8,10 @@
 namespace FCN {
   const int nev = 100000;
   double data[nev][2];
+  double mc[nev*5][2];
   void FCN(int & n_par, double * gradients, double & ret_val, double * par, int flag);
   void ReadData(const char * filename);
+  void ReadNormData(const char * filename);
   TFumili * fumili;
   void Print(const char * name, int n, double * d);
   double PDF(double * x, double * p);
@@ -18,23 +21,12 @@ namespace FCN {
 }
 
 int main(int arc, char ** argv) {
-  // check MC normalization
-  double mc[FCN::nev*5][2];
-  std::ifstream ifs("mc_.dat");
-  for(int i = 0; i < FCN::nev*5; i++)
-    ifs >> mc[i][0] >> mc[i][1];
-  ifs.close();
-  double p[] = {0.5, 0.3, 0.8, 0.1};
-  double norm = 0;
-  for(int iev = 0; iev < FCN::nev*5; iev++) {
-    norm += FCN::PDF(mc[iev], p);
-  }
-  norm /= FCN::nev*5;
-  std::cout<<"Norm MC: "<<norm<<", ";
-  norm = FCN::Norm(p);
-  std::cout<<"Norm analytical: "<<norm<<std::endl;
+//   std::cout<<"Norm MC: "<<norm<<", ";
+//   norm = FCN::Norm(p);
+//   std::cout<<"Norm analytical: "<<norm<<std::endl;
   // start analysis
   FCN::ReadData("unif_.dat");
+  FCN::ReadNormData("mc_.dat");
   // initialize fitter
   FCN::fumili = new TFumili;
   FCN::fumili->SetParNumber(4);
@@ -119,6 +111,13 @@ void FCN::ReadData(const char * filename) {
     ifs >> data[i][0] >> data[i][1];
   ifs.close();
 }
+void FCN::ReadNormData(const char * filename) {
+  // check MC normalization
+  std::ifstream ifs(filename);
+  for(int i = 0; i < nev*5; i++)
+    ifs >> mc[i][0] >> mc[i][1];
+  ifs.close();
+}
 void FCN::Print(const char * name, int n, double * d) {
   std::cout<<name<<":";
   for(int i = 0; i < n; i++)
@@ -129,7 +128,13 @@ double FCN::PDF(double * x, double * p) {
   return 1 + p[0]*x[0] + p[1]*x[0]*x[0] + p[2]*x[1] + p[3]*x[1]*x[1];
 }
 double FCN::Norm(double * p) {
-  return 1 + p[0]/2. + p[1]/3. + p[2]/2. + p[3]/3.;
+//   return 1 + p[0]/2. + p[1]/3. + p[2]/2. + p[3]/3.;
+  double norm = 0;
+  for(int iev = 0; iev < nev*5; iev++) {
+    norm += PDF(mc[iev], p);
+  }
+  norm /= nev*5;
+  return norm;
 }
 double FCN::dPDFdx(int np, double * x, double * p, double pdf) {
   double _p[4] = {0.};

@@ -29,6 +29,10 @@ $(TARG): $(TARG).o $(addsuffix .o,$(OBJS))
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
 
+TestFitter: TestFitter.o AbstractFitter.o MyPDF.o
+	@echo 'Linking executable $@'
+	@$(CXX) $^ $(LDFLAGS) -o $@
+
 test_inv: $(addsuffix .o,test_inv mtrx_inv test_mat)
 	@echo 'Linking executable $@'
 	@$(CXX) $^ $(LDFLAGS) -o $@
