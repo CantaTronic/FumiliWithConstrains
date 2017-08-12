@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <TFumili.h>
+#include <TFitter.h>
 
 struct FitParameter {
   std::string name;
@@ -20,39 +21,44 @@ protected:
 public:
   virtual void AddParameter(std::string name, double val, double step = 0.01);
   virtual void AddParameter(std::string name, double val, double min, double max, double step = 0.01);
-  virtual void AddFixedParameter(std::string name, double val, double step = 0.01);
+  virtual void AddFixedParameter(std::string name, double val);
   virtual operator std::vector<FitParameter>&() { return parameters; }
 };
 
 class AbstractFitter {
 protected:
+  unsigned fcn_call;
+  TVirtualFitter * root_fitter;
   double * parameters;
+  std::vector<bool> is_par_fixed;
   double objective_function;
   double * gradients;
+  double * second_derivatives;
   static AbstractFitter * currentFitter;
   static void FCN(int & n_par, double * gradients, double & ret_val, double * par, int flag);
+  virtual void InitFitter(const std::vector<FitParameter> & par);
+  virtual void MinimizeFumili(const std::vector<FitParameter> & par);
+  virtual void MinimizeMinuit(const std::vector<FitParameter> & par);
+  virtual double FCNFumili() = 0;
+  virtual double FCNMigrad() = 0;
 public:
-  AbstractFitter(): parameters(0), objective_function(0), gradients(0) { }
+  enum Strategy {FUMILI, MIGRAD, SIMPLEX} strategy;
+  enum {GRAD_NONE, GRAD_CHECK, GRAD_FORCE} do_user_gradients;
+  AbstractFitter(Strategy _strategy = MIGRAD)
+  : fcn_call(0), root_fitter(0), parameters(0),
+    objective_function(0), gradients(0), second_derivatives(0),
+    strategy(_strategy), do_user_gradients(GRAD_CHECK) { }
+  virtual ~AbstractFitter() { }
   virtual bool HasGradients() { return gradients; }
   virtual void SetGradients(double * grad) { gradients = grad; }
   virtual void SetParameters(double * par) { parameters = par; }
-  virtual void Minimize(const std::vector<FitParameter> & par) = 0;
-  virtual double FCN() = 0;
-  static void Print(const char * name, int n, double * d);
-};
-
-class AbstractFumiliFitter: public AbstractFitter {
-protected:
-  TFumili * fumili;
-  double * second_derivatives;
-  double * steps;
-public:
-  AbstractFumiliFitter(): fumili(0), second_derivatives(0), steps(0) { }
   virtual void Minimize(const std::vector<FitParameter> & par);
-  virtual double FCN() = 0;
+  virtual double FCN();
+  static void Print(const char * name, int n, double * d);
+  virtual void PrintParameters();
 };
 
-class AbstractFumiliLogLikelihoodFitter: public AbstractFumiliFitter {
+class AbstractLogLikelihoodFitter: public AbstractFitter {
 protected:
   unsigned nev;
   double pdf, norm;
@@ -60,6 +66,8 @@ protected:
   virtual double dPDFdp(unsigned i_par, unsigned i_ev);
   virtual double Norm() { return 1.; }
   virtual double dNormdx(unsigned i_par);
+  virtual double FCNFumili();
+  virtual double FCNMigrad();
 public:
-  virtual double FCN();
+  virtual ~AbstractLogLikelihoodFitter() { }
 };

@@ -16,7 +16,7 @@ ifeq ($(LALIB),OPENBLAS)
   LDFLAGS += -lopenblas
 endif
 ifeq ($(LALIB),ROOT)
-  LDFLAGS += $(shell root-config --libs) -lFumili
+  LDFLAGS += $(shell root-config --libs) -lMinuit -lFumili
 endif
 
 TARG := test
