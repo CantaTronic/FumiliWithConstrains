@@ -3,71 +3,84 @@
 
 #include <vector>
 #include <string>
-#include <TFumili.h>
-#include <TFitter.h>
 
-struct FitParameter {
-  std::string name;
-  double val;
-  enum {IS_FIXED, IS_FREE, IS_LIMITED} type;
-  double step;
-  double min;
-  double max;
-};
-
-class FitParameterSetter {
+class FitParameters {
 protected:
-  std::vector<FitParameter> parameters;
+  unsigned n_par, n_free_par;
+  std::vector<std::string> names;
+  std::vector<double> params;
+  enum Type {IS_FIXED, IS_FREE, IS_LIMITED};
+  std::vector<Type> types;
+  std::vector<double> steps;
+  std::vector<double> minima;
+  std::vector<double> maxima;
 public:
+  FitParameters(): n_par(0), n_free_par(0) { }
   virtual void AddParameter(std::string name, double val, double step = 0.01);
   virtual void AddParameter(std::string name, double val, double min, double max, double step = 0.01);
   virtual void AddFixedParameter(std::string name, double val);
-  virtual operator std::vector<FitParameter>&() { return parameters; }
+  virtual void SetParameters(const double * par);
+  virtual unsigned NPar() { return n_par; }
+  virtual unsigned NFreePar() { return n_free_par; }
+  virtual const char * Name(unsigned i) { return names[i].c_str(); }
+  virtual double Val(unsigned i) { return params[i]; }
+  virtual double Step(unsigned i) { return steps[i]; }
+  virtual double Min(unsigned i) { return minima[i]; }
+  virtual double Max(unsigned i) { return maxima[i]; }
+  virtual bool IsFixed(unsigned i) { return types[i] == IS_FIXED; }
 };
 
-class AbstractFitter {
+class ObjectiveFunction: public FitParameters {
 protected:
-  unsigned fcn_call;
-  TVirtualFitter * root_fitter;
-  double * parameters;
-  std::vector<bool> is_par_fixed;
-  double objective_function;
-  double * gradients;
-  double * second_derivatives;
-  static AbstractFitter * currentFitter;
-  static void FCN(int & n_par, double * gradients, double & ret_val, double * par, int flag);
-  virtual void InitFitter(const std::vector<FitParameter> & par);
-  virtual void MinimizeFumili(const std::vector<FitParameter> & par);
-  virtual void MinimizeMinuit(const std::vector<FitParameter> & par);
-  virtual double FCNFumili() = 0;
-  virtual double FCNMigrad() = 0;
+  double last_val;
 public:
-  enum Strategy {FUMILI, MIGRAD, SIMPLEX} strategy;
-  enum {GRAD_NONE, GRAD_CHECK, GRAD_FORCE} do_user_gradients;
-  AbstractFitter(Strategy _strategy = MIGRAD)
-  : fcn_call(0), root_fitter(0), parameters(0),
-    objective_function(0), gradients(0), second_derivatives(0),
-    strategy(_strategy), do_user_gradients(GRAD_CHECK) { }
-  virtual ~AbstractFitter() { }
-  virtual bool HasGradients() { return gradients; }
-  virtual void SetGradients(double * grad) { gradients = grad; }
-  virtual void SetParameters(double * par) { parameters = par; }
-  virtual void Minimize(const std::vector<FitParameter> & par);
-  virtual double FCN();
-  static void Print(const char * name, int n, double * d);
-  virtual void PrintParameters();
+  unsigned fcn_call;
+  virtual void Eval(double * par, double & val, double * grad = 0, double * Z = 0) = 0;
+  virtual double LastVal() { return last_val; }
+  virtual ~ObjectiveFunction() { }
+  static void Print(const char * name, unsigned n, double * d);
+  void PrintParameters();
 };
 
-class AbstractLogLikelihoodFitter: public AbstractFitter {
+class LogLikelihoodObjFunc: public ObjectiveFunction {
 protected:
   unsigned nev;
   double pdf, norm;
+//   unsigned i_ev, i_par;
   virtual double PDF(unsigned i_ev) = 0;
-  virtual double dPDFdp(unsigned i_par, unsigned i_ev);
+  virtual double dPDFdp(unsigned i_ev, unsigned i_par);
   virtual double Norm() { return 1.; }
   virtual double dNormdx(unsigned i_par);
-  virtual double FCNFumili();
-  virtual double FCNMigrad();
 public:
-  virtual ~AbstractLogLikelihoodFitter() { }
+  virtual void Eval(double * _par, double & val, double * grad = 0, double * Z = 0);
+  virtual ~LogLikelihoodObjFunc() { }
+};
+
+class Minimizer {
+protected:
+  ObjectiveFunction * objFunc;
+public:
+  Minimizer(): objFunc(0) { }
+  Minimizer(ObjectiveFunction * f): objFunc(f) { }
+  virtual ~Minimizer() { }
+  virtual void SetObjFunc(ObjectiveFunction * f) { objFunc = f; }
+  virtual void Minimize() = 0;
+};
+
+class TVirtualFitter;
+
+class ROOTMinimizer: public Minimizer {
+protected:
+  static void FCN(int & n_par, double * gradients, double & ret_val, double * par, int flag);
+  static TVirtualFitter * gFitter;
+  static ObjectiveFunction * gObjFunc;
+public:
+  enum Strategy {FUMILI, SIMPLEX, MIGRAD, MIGRAD_G};
+  static Strategy gStrategy;
+  ROOTMinimizer() { }
+  ROOTMinimizer(Strategy s) { gStrategy = s; }
+  ROOTMinimizer(ObjectiveFunction * f): Minimizer(f) { }
+  ROOTMinimizer(Strategy s, ObjectiveFunction * f): Minimizer(f) { gStrategy = s; }
+  virtual ~ROOTMinimizer() { }
+  virtual void Minimize();
 };

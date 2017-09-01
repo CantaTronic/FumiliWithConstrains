@@ -1,62 +1,38 @@
 
 #include "TestFitter.h"
 #include "MyPDF.h"
-#include <TStopwatch.h>
 #include <iostream>
 #include <fstream>
 
 int main() {
-  FitParameterSetter par;
-  par.AddFixedParameter("#alpha1", .5);
-  par.AddParameter("#beta1", 0);
-  par.AddParameter("#alpha2", 1);
-  par.AddParameter("#beta2", 0);
-  TestFitter * fitter = new TestFitter;
-  fitter->ReadData("unif_.dat");
-  fitter->ReadNormData("mc_.dat");
-  TStopwatch timer;
-  std::cout<<"\n ==== MIGRAD GRAD_NONE ===="<<std::endl;
-  timer.Start();
-  fitter->strategy = AbstractFitter::MIGRAD;
-  fitter->do_user_gradients = AbstractFitter::GRAD_NONE;
-  fitter->Minimize(par);
-  timer.Stop();
-  timer.Print();
-  timer.Reset();
-  std::cout<<"\n ==== MIGRAD GRAD_CHECK ===="<<std::endl;
-  timer.Start();
-  fitter->strategy = AbstractFitter::MIGRAD;
-  fitter->do_user_gradients = AbstractFitter::GRAD_CHECK;
-  fitter->Minimize(par);
-  timer.Stop();
-  timer.Print();
-  timer.Reset();
-  std::cout<<"\n ==== MIGRAD GRAD_FORCE ===="<<std::endl;
-  timer.Start();
-  fitter->strategy = AbstractFitter::MIGRAD;
-  fitter->do_user_gradients = AbstractFitter::GRAD_FORCE;
-  fitter->Minimize(par);
-  timer.Stop();
-  timer.Print();
-  timer.Reset();
-  std::cout<<"\n ==== SIMPLEX ===="<<std::endl;
-  timer.Start();
-  fitter->strategy = AbstractFitter::SIMPLEX;
-  fitter->Minimize(par);
-  timer.Stop();
-  timer.Print();
-  timer.Reset();
-  std::cout<<"\n ==== FUMILI ===="<<std::endl;
-  timer.Start();
-  fitter->strategy = AbstractFitter::FUMILI;
-  fitter->Minimize(par);
-  timer.Stop();
-  timer.Print();
-  timer.Reset();
-  delete fitter;
+  TestFit fcn;
+  fcn.ReadData("unif_.dat");
+  fcn.ReadNormData("mc_.dat");
+  fcn.Minimize(ROOTMinimizer::MIGRAD, "MIGRAD GRAD_NONE");
+  fcn.Minimize(ROOTMinimizer::MIGRAD_G, "MIGRAD GRAD_FORCE");
+  fcn.Minimize(ROOTMinimizer::SIMPLEX, "SIMPLEX");
+  fcn.Minimize(ROOTMinimizer::FUMILI, "FUMILI");
 }
 
-bool TestFitter::ReadData(const std::string filename) {
+const double TestFit::defaultParams[] = {.5, 0., 1., 0.};
+TestFit::TestFit() {
+  AddFixedParameter("#alpha1", defaultParams[0]);
+  AddParameter("#beta1", defaultParams[1]);
+  AddParameter("#alpha2", defaultParams[2]);
+  AddParameter("#beta2", defaultParams[3]);
+}
+void TestFit::Minimize(ROOTMinimizer::Strategy strategy, const char * title) {
+  SetParameters(defaultParams);
+  std::cout<<"\n ==== "<<title<<" ===="<<std::endl;
+  timer.Start();
+  ROOTMinimizer * minimizer = new ROOTMinimizer(strategy, this);
+  minimizer->Minimize();
+  delete minimizer;
+  timer.Stop();
+  timer.Print();
+  timer.Reset();
+}
+bool TestFit::ReadData(const std::string filename) {
   nev = 0;
   float data_i[MyPDF::nDim];
   std::ifstream ifs(filename.c_str());
@@ -70,10 +46,10 @@ bool TestFitter::ReadData(const std::string filename) {
       data.push_back(data_i[iDim]);
   }
   ifs.close();
-  std::cout<<"TestFitter::ReadData("<<filename<<"): read "<<nev<<" events"<<std::endl;
+  std::cout<<"TestFit::ReadData("<<filename<<"): read "<<nev<<" events"<<std::endl;
   return nev;
 }
-bool TestFitter::ReadNormData(const std::string filename) {
+bool TestFit::ReadNormData(const std::string filename) {
   nev_norm = 0;
   float data_i[MyPDF::nDim];
   std::ifstream ifs(filename.c_str());
@@ -87,16 +63,16 @@ bool TestFitter::ReadNormData(const std::string filename) {
       data_norm.push_back(data_i[iDim]);
   }
   ifs.close();
-  std::cout<<"TestFitter::ReadNormData("<<filename<<"): read "<<nev_norm<<" events"<<std::endl;
+  std::cout<<"TestFit::ReadNormData("<<filename<<"): read "<<nev_norm<<" events"<<std::endl;
   return nev_norm;
 }
-double TestFitter::PDF(unsigned i_ev) {
-  return MyPDF::PDF(&data.data()[i_ev*MyPDF::nDim], parameters);
+double TestFit::PDF(unsigned i_ev) {
+  return MyPDF::PDF(&data.data()[i_ev*MyPDF::nDim], params.data());
 }
-double TestFitter::Norm() {
+double TestFit::Norm() {
   double norm = 0;
   for(unsigned iev = 0; iev < nev_norm; iev++) {
-    norm += MyPDF::PDF(&data_norm.data()[iev*MyPDF::nDim], parameters);
+    norm += MyPDF::PDF(&data_norm.data()[iev*MyPDF::nDim], params.data());
   }
   norm /= nev_norm;
   return norm;
