@@ -1,5 +1,5 @@
 
-#include "TestFitter.h"
+#include "TestFit.h"
 #include "MyPDF.h"
 #include <iostream>
 #include <fstream>

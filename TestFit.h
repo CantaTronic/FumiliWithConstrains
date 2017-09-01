@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "AbstractFitter.h"
+#include "ObjectiveFunction.h"
+#include "Minimizer.h"
 #include <TStopwatch.h>
 
 class TestFit: public LogLikelihoodObjFunc {
