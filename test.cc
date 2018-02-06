@@ -40,6 +40,7 @@ int main(int arc, char ** argv) {
     //run tests
     runTestFit(1, "UnConstrained Fit", idebug);
     runTestFit(2, "Constrained Fit", idebug);
+    
     return 0;
 }
 
@@ -74,6 +75,8 @@ void runTestFit(int count, string testType, int idebug) {
 }
 
 int SGZ(int m, double &S, double A[], double PL[], double G[], double Z[]) {
+  /*В случае успешного выполнения, видимо, возвращает 2.
+   Определяется пользователем для передачи в фиттер*/
   S = 0.;
   //заполнение диагональной матрицы вторых производных
   for (int i = 0; i < m; i++) {
@@ -125,27 +128,40 @@ int SGZ(int m, double &S, double A[], double PL[], double G[], double Z[]) {
 }
 
 void constraints(int M, double A[], double * psis, double ** dpsis) {
-  /* First - cleaning derivatives */
-  for(int j = 0;j < M;j++) {
-    if(idebug) cout << " j, A[j] " <<j << "  " << A[j] << endl;
+  /*dpsis - производные второго порядка,
+   psis - первые производные */
+  if(idebug) { //контрольная печать значений массива
+    cout << "j\tA[j]"<<endl;
+    for(int j = 0;j < M;j++) {
+      cout <<j << "  " << A[j] << endl;
+    }
   }
+  //обнуление мтрицы вторых производных
   for(int i = 0; i < 1;i++) {
     for(int j = 0; j < M;j++) {
       dpsis[i][j] = .0;
     }
   }
+  
+  //TODO: понять, что происходит в этих трёх строчках?
   psis[0] = A[0] + A[1] - 1.3;
   dpsis[0][0] = 1.;
   dpsis[0][1] = 1.;
-  if(idebug)
+  
+  if(idebug) {  //ещё одна контрольная печать
+    cout<<"i\tpsis[i]"<< endl;
     for(int i = 0; i < 1; i++) {
-      cout << " i, psis[i], derivatives.. = " << i  << "  " << psis[i] << "  " ;
+      cout << i  << "\t" << psis[i] << "\t\t"<<endl ;
+    }
+    cout<<"2nd derivatives"<< endl;
+    for(int i = 0; i < 1; i++) {
       for(int j = 0; j < M; j++) {
-        cout << dpsis[i][j] << "  " ;
+        cout <<dpsis[i][j]<<"\t";
       }
       cout << endl;
-      cout << "*******************************" << endl;
     }
+    cout << string(15,'*') << endl;
+  }
 }
 
 void setTestPars(double A[], double PL0[], double AMX[], double AMN[],
