@@ -12,11 +12,13 @@ const int dataSize = 100000;  //just like this for that simple test example
 const int parNum = 2;   //number of parameters (as far as I get)
 double data[dataSize][parNum];
 
-//TODO: В коде сплошные "магические числа".
+//TODO: В коде сплошные "магические числа". +-
 //понять, что откуда взялось и исправить.
 
 //TODO: Задокументировать основные действия и функции
 //задокументировать имена параметров
+
+//TODO: Понять, куда девалась контрольная печать от SGZ
 
 int SGZ(int m, double &S, double A[], double PL[], double G[], double Z[]);  //внутренняя функция, используемая минимизатором Фумили. Задается пользователем
 void constraints(int M, double A[], double * psis, double ** dpsis);    //Функция ограничений. Также задается пользователем по определённым правилам.
@@ -41,26 +43,62 @@ int main(int arc, char ** argv) {
     return 0;
 }
 
+void runTestFit(int count, string testType, int idebug) {
+    /*  Define parameters:
+    //AMN - array of minimal values
+    //AMX - array of maximum values
+    //A - array with start parameters values
+    //SIGMA - error on second derivatives
+    TODO: to be continued...
+    */
+  cout<<string(20,'*')<<"TEST"<<count<<": "<<testType<<string(20,'*')<<endl;
+  //define parameters
+  double AMN[parNum], AMX[parNum], PL0[parNum], A[parNum], R[parNum], SIGMA[parNum], VL[parNum*parNum], akappa, S;
+  int N1, N2, N3, IT;
+  double EPS;
+  
+  //set parameters (and print them out if debug)
+  setTestPars (A, PL0, AMX, AMN, &N1, &N2, &N3, &IT, &EPS);
+  if(idebug) {
+    getDebugInfo (A, PL0, AMX, AMN);
+  }
+  //make fit
+  if (testType == "UnConstrained Fit") {
+      fumiliSK(parNum, S, N1, N2, N3, EPS, IT, A, PL0, AMX, AMN, R, SIGMA, SGZ, akappa, VL);
+  } else {
+      fumiliSK(parNum, S, N1, N2, N3, EPS, IT, A, PL0, AMX, AMN, R, SIGMA, SGZ, akappa, VL, 1, constraints);
+  }
+  //print out results
+  fitInfo(testType, akappa, EPS, A, SIGMA);
+  cout<<endl;
+}
+
 int SGZ(int m, double &S, double A[], double PL[], double G[], double Z[]) {
   S = 0.;
+  //заполнение диагональной матрицы вторых производных
   for (int i = 0; i < m; i++) {
     for (int j = 0; j <= i; j++)
       Z[(i+1)*i/2 + j] = .0;
     G[i] = .0;
   }
-  if(idebug) cout << " SGZ, m                   = " << m << endl;
-  if(idebug) cout << " SGZ, Parameters at entry = " << endl;
-  for(int i = 0; i < m;i++) {
-    if(idebug)
-      cout << " SGZ, i,A[i],PL[i]  = " << i << "  " << A[i] << "  " << PL[i] << endl;
+  //вывод значений параметров (контрольная печать)
+  if(idebug) {
+    cout <<string(20, '=')<<"SGZ debug"<<string(20, '=')<<endl;
+    cout<<"Parameters at entry (m) = " << m << endl;
+    cout<<"i\tA[i]\tPL[i]\t"<< endl;
+    for(int i = 0; i < m;i++) {
+      cout << i << "\t" << A[i] << "\t" << PL[i] << endl;
+    }
   }
+  
   for (int iev = 0; iev < dataSize; iev++) {
-    double CH = 1. + A[0]*data[iev][0] + A[1]*data[iev][1];
-    double ZN = 1. + 0.5*A[0] + 0.5*A[1];
-    double pdf = CH/ZN;//pdf
+    //числитель и знаменатель, видимо, и являются глаными параметрами, поределяемыми пользователем
+    double CH = 1. + A[0]*data[iev][0] + A[1]*data[iev][1];   //числитель
+    double ZN = 1. + 0.5*A[0] + 0.5*A[1];   //знаменатель
+    double pdf = CH/ZN;   //pdf
     // Derivatives
-    double df[2];
-    for(int i = 0; i < 2;i++) {
+    double df[parNum];
+    for(int i = 0; i < parNum;i++) {
       double dch = data[iev][i];
       double dzn = 0.5;
       double ys = (dch - pdf*dzn)/ZN;
@@ -108,36 +146,6 @@ void constraints(int M, double A[], double * psis, double ** dpsis) {
       cout << endl;
       cout << "*******************************" << endl;
     }
-}
-
-void runTestFit(int count, string testType, int idebug) {
-    /*  Define parameters:
-    //AMN - array of minimal values
-    //AMX - array of maximum values
-    //A - array with start parameters values
-    //SIGMA - error on second derivatives
-    TODO: to be continued...
-    */
-   cout<<string(20,'*')<<"TEST"<<count<<": "<<testType<<string(20,'*')<<endl;
-  //define parameters
-  double AMN[parNum], AMX[parNum], PL0[parNum], A[parNum], R[parNum], SIGMA[parNum], VL[parNum*parNum], akappa, S;
-  int N1, N2, N3, IT;
-  double EPS;
-  
-  //set parameters (and print them out if debug)
-  setTestPars (A, PL0, AMX, AMN, &N1, &N2, &N3, &IT, &EPS);
-  if(idebug) {
-    getDebugInfo (A, PL0, AMX, AMN);
-  }
-  //make fit
-  if (testType == "UnConstrained Fit") {
-      fumiliSK(parNum, S, N1, N2, N3, EPS, IT, A, PL0, AMX, AMN, R, SIGMA, SGZ, akappa, VL);
-  } else {
-      fumiliSK(parNum, S, N1, N2, N3, EPS, IT, A, PL0, AMX, AMN, R, SIGMA, SGZ, akappa, VL, 1, constraints);
-  }
-  //print out results
-  fitInfo(testType, akappa, EPS, A, SIGMA);
-  cout<<endl;
 }
 
 void setTestPars(double A[], double PL0[], double AMX[], double AMN[],
