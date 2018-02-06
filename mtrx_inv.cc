@@ -84,31 +84,36 @@ double FSqMtrx::Determinant(const int N, const double * const M) {
 
 #else
 
+//инвертирование матрицы A размером n*n c использованием LAPACKE_dgetrf/LAPACKE_dgetri
 int FSqMtrx::Invert(const int n, double * const A) {
   int ipiv[n+1];
   int ret;
-  ret = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, A, n, ipiv);
+  ret = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, A, n, ipiv);   //TODO: в каких случаях LAPACKE_dgetrf возвращает 0?
   if (ret !=0)
     return ret;
   ret = LAPACKE_dgetri(LAPACK_ROW_MAJOR, n, A, n, ipiv);
   return ret;
 }
 
+//подсчет детерминанта
 double FSqMtrx::Determinant(const int n, const double * const M) {
   int ret;
   int ipiv[n+1];
   double * T = new double[n*n];
   memcpy(T, M, n*n*sizeof(double));
-  ret = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, T, n, ipiv);
-  if(ret != 0) {
+  ret = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, T, n, ipiv);   //пробуем инвертировать матрицу
+  if(ret != 0) {  //если не инвертируется
     delete [] T;
     return 0.;
   }
-  double det = 1.;
+  
+  double det = 1.;  //инициализация детерминанта
+  
   // sign
   for(int i = 0; i < n; i++)
     if(ipiv[i]-1 != i) // note: fortran indexing starts from 1!
       det *= -1;
+    
   // value
   for(int i = 0; i < n; i++)
     det *= T[i*n+i]; // diagonal element
@@ -118,6 +123,7 @@ double FSqMtrx::Determinant(const int n, const double * const M) {
 
 #endif
 
+//печать одномерной матрицы, как будто она двумерная
 void FSqMtrx::Print(const int N, const double * const M) {
   for (int i = 0; i < N*N; i++) {
     if ((i%N) == 0) putchar('\n');
