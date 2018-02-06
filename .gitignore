@@ -1,2 +1,7 @@
 *.[od]
 *~
+test
+*.aux
+*.log
+*.pdf
+
