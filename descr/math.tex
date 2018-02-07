@@ -1,20 +1,30 @@
 \documentclass[a4paper,10pt]{article}
-\usepackage[utf8]{inputenc}
+\usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
+\usepackage[english,russian]{babel}
 
 %opening
-\title{Mathematics under a Fulimi maximum likelihood realization}
+% \title{Mathematics under a Fulimi maximum likelihood realization}
+\title{Математическая оптимизация в минимизаторах Fumili и Fumili-with-constraints}
 % \author{Tokareva~V.~A.}
 
 \begin{document}
 
 \maketitle
 
-% \begin{abstract}
-%
-% \end{abstract}
+Рассмотрим задачу, когдa у нас имеется серия наблюдаемых измерений физической величины (величин) и нужно сопоставить эмпирическое распределение этих величин с неким распределением, предсказанным теорией.
 
-% \section{}
+Пусть нами измерены величины $F_j$ с ошибками $\sigma_j$ в точках $x_j$ $j \in [1, \dots, m)$.
+Предположим, что нам нужно найти параметры $\Theta$ теоретической модели таким образом, чтобы данная модель наиболее точно фитировала наши измерения.
+
+Критерий $\chi^2$ Пирсона показывает нам вероятность того, что эмпирические данные могут соотстветствовать интересующему нас физическому закону:
+
+\begin{equation}
+\label{pirs}
+ \chi^2 = \frac{1}{2} \sum_{j = 1}^{m} \left( \frac{f_j(x_j,\theta) - F_j}{\sigma_j} \right)
+\end{equation}
+
+Если рассчитанное нами значение (\ref{pirs}) оказывается меньше значения с нужной степенью правдоподобности из таблицы значений $\chi_{kr}$, мы можем принять с этой степенью веростности, что два распределения практически не различаются.
 
 Let's name probability dencity function as \textit{pdf}. And normalized \textit{pdf} as \textit{norm}.
 
