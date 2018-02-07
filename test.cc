@@ -29,7 +29,7 @@ void fitInfo(string fitType, double akappa, double EPS, double A[], double SIGMA
 void runTestFit(int count, string testType, int idebug);
 
 int main(int arc, char ** argv) {
-    const int idebug = 1;   //debug is on
+    idebug = 1;   //debug is on
 
     //read input data
     ifstream ifs("unif.dat");
@@ -50,6 +50,7 @@ void runTestFit(int count, string testType, int idebug) {
     //AMX - array of maximum values
     //A - array with start parameters values
     //SIGMA - error on second derivatives
+    PL0 - если параметр фиксирован, соотв. значение PL0 равно 0. Иначе - 0.1.
     TODO: to be continued...
     */
   cout<<string(20,'*')<<"TEST"<<count<<": "<<testType<<string(20,'*')<<endl;
